@@ -1,0 +1,9 @@
+C++ ohjelma:
+- Yksinkertainen ja siisti käyttöliittymä
+- Muodostetaan yhteys robottiin
+- Esitetään robotin nykyinen tila (akun varaus, tehtävä, toimenpide)
+- Mahdollisuus pysäyttää robotin toiminta kokonaan
+- Mahdollisuus paikantaa robotti (ääni?)
+- Mahdollisuus kutsua robotti takaisin
+- Mahdollisuus sammuttaa robotti etänä?
+- Lokitietojen hakeminen ja näyttäminen tietokannasta / robotilta?
