@@ -1,9 +1,27 @@
 C++ ohjelma:
+- Toimii Linux- ja Windows alustoilla
+
 - Yksinkertainen ja siisti käyttöliittymä
-- Muodostetaan yhteys robottiin
-- Esitetään robotin nykyinen tila (akun varaus, tehtävä, toimenpide)
+  Käyttöliittymä toimii omassa, erillisessä threadissa
+  Tällä mahdollistetaan käyttöliittymän sulava toiminta
+
+
+- Yhteyden muodostaminen robottiin
+  Erillinen threadi, johon luodaan socketti yhteyttä varten
+  Threadista emitoidaan signaaleja, joille luodaan vastaanottavat slotit käyttöliittymään
+
 - Mahdollisuus pysäyttää robotin toiminta kokonaan
-- Mahdollisuus paikantaa robotti (ääni?)
+- Mahdollisuus paikantaa robotti (ääni ?)
 - Mahdollisuus kutsua robotti takaisin
-- Mahdollisuus sammuttaa robotti etänä?
-- Lokitietojen hakeminen ja näyttäminen tietokannasta / robotilta?
+- Mahdollisuus sammuttaa robotti etänä ?
+- Mahdollisuus antaa robotille tehtäviä ?
+
+- Lokitietojen hakeminen ja näyttäminen tietokannasta / robotilta ?
+- Esitetään robotin nykyinen tila
+  - Akun varaus
+  - Nykyinen tehtävä
+  - Viimeisin / tämän hetkinen toiminta
+  - Robotin verkkoyhteyden laatu ?
+
+- Varoitus vähäisestä akun varauksesta ?
+- Ilmoitus, jos robotti on eksynyt / jäänyt jumiin ?
