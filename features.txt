@@ -2,19 +2,21 @@ C++ ohjelma:
 - Toimii Linux- ja Windows alustoilla
 
 - Yksinkertainen ja siisti käyttöliittymä
-  Käyttöliittymä toimii omassa, erillisessä threadissa
-  Tällä mahdollistetaan käyttöliittymän sulava toiminta
+  --Käyttöliittymä toimii omassa, erillisessä threadissa
+  --Mahdollistetaan käyttöliittymän sulava toiminta
+  --Pystytään käyttämään käyttöliittymää, vaikka jokin toinen toiminta olisi käynnissä
 
 
 - Yhteyden muodostaminen robottiin
-  Erillinen threadi, johon luodaan socketti yhteyttä varten
-  Threadista emitoidaan signaaleja, joille luodaan vastaanottavat slotit käyttöliittymään
+  --Erillinen threadi, johon luodaan socketti yhteyttä varten
+  --Threadista emitoidaan signaaleja, joille luodaan vastaanottavat slotit käyttöliittymän puolelle
 
 - Mahdollisuus pysäyttää robotin toiminta kokonaan
 - Mahdollisuus paikantaa robotti (ääni ?)
 - Mahdollisuus kutsua robotti takaisin
 - Mahdollisuus sammuttaa robotti etänä ?
-- Mahdollisuus antaa robotille tehtäviä ?
+- Mahdollisuus antaa robotille tehtäviä
+  --Paketin muodostaminen ja lähettäminen (paketin sisältö komennon mukaan)
 
 - Lokitietojen hakeminen ja näyttäminen tietokannasta / robotilta ?
 - Esitetään robotin nykyinen tila
@@ -22,6 +24,10 @@ C++ ohjelma:
   - Nykyinen tehtävä
   - Viimeisin / tämän hetkinen toiminta
   - Robotin verkkoyhteyden laatu ?
+    --Yhteyden muodostaminen ja datan pyytäminen.
+    --Saadun datan purkaminen ja jäsenteleminen
+    --Datan esittäminen
 
 - Varoitus vähäisestä akun varauksesta ?
 - Ilmoitus, jos robotti on eksynyt / jäänyt jumiin ?
+  -- Erillinen pop-up ikkuna ?
