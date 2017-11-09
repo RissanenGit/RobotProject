@@ -19,8 +19,11 @@ class Server:
             while True:
                 data = connection.recv(self.bufferSize)
                 if not data:
-                    break;
+                    break
                 else:
                     print("Received data: ",self.parser.parseData(data))
             print("Client disconnected: ", address)
             connection.close()
+
+server = Server(('127.0.0.1',9999))
+server.listen()
