@@ -5,23 +5,22 @@ Connection::Connection(QObject *parent, QString address, qint16 port) : QObject(
     this->port = port;
 }
 
-Connection::~Connection(){
+Connection::~Connection(){ //Socket is deleted when connection is deleted in main thread
+        qDebug() << "Socket deleted";
         delete socket;
         socket = nullptr;
 }
 
 
 ///Functions->
-void Connection::connectSignals()
-{
+void Connection::connectSignals(){ //Handles connecting all the necessary signals
     //connect(socket,SIGNAL(readyRead()),this,SLOT(readData()));
     connect(socket,SIGNAL(disconnected()),this,SLOT(disconnectedFromServer()));
 
     qDebug() << "Connected signals";
 }
 
-void Connection::emitSignal(Connection::connectionStatus status, QString statusText)
-{
+void Connection::emitSignal(Connection::connectionStatus status, QString statusText){ //Handles the updating of certain UI elements
     switch (status) {
     case connectionStatus::Connected:
         emit statusChanged(statusText);
@@ -40,29 +39,26 @@ void Connection::emitSignal(Connection::connectionStatus status, QString statusT
     }
 }
 
-bool Connection::retryConnection()
-{
-    for(int i = 0;i < retryCount; i++){
+bool Connection::retryConnection(){ //Handles reconnecting to the server
+    for(int i = 0;i < retryCount; i++){ //Try (5) times to connect to the server
 
         qDebug() << "Retry " << i + 1;
-        QString teksti = QStringLiteral("Connecting... (Retry: %1)").arg(i + 1);
-        emitSignal(connectionStatus::Connecting,teksti);
+        QThread::msleep(retryTimeout); //Sleep for 5 seconds, give time for the server to come up
 
-        QThread::msleep(retryTimeout);
-
+        emitSignal(connectionStatus::Connecting,QStringLiteral("Connecting... (Retry: %1)").arg(i + 1));//Update UI on the reconnection status
         socket->connectToHost(address,port);
         if(socket->waitForConnected(5000)){
             qDebug() << "Connection re-established";
             emitSignal(connectionStatus::Connected,"Connected");
-            return true;
+            connectSignals(); //Reconnect signals
+            return true; //Connection re-established
         }
     }
-    return false;
+    return false; //Can't re-establish connection
 }
 
 ///Slots->
-void Connection::createConnection()
-{
+void Connection::createConnection(){ //Entrypoint
     qDebug() << "Creating connection";
 
     socket = new QTcpSocket();
@@ -72,36 +68,32 @@ void Connection::createConnection()
     if(socket->waitForConnected(5000)){
         qDebug() << "Connected to server";
         emitSignal(connectionStatus::Connected,"Connected");
-        connectSignals();
+        connectSignals();//Connect signals
     }
     else{
         qDebug() << "Cant connect to server";
-        if(!retryConnection()){
-            emitSignal(connectionStatus::Disconnected,"Disconnected");
-            emit finished();
+        if(!retryConnection()){ //Try to connect 5 times
+            emitSignal(connectionStatus::Disconnected,"Cant connect to server");
+            emit finished(); //Emitting finished, signal is allocated to threads quit slot, this will exit from the thread
         }
-
     }
 }
 
-void Connection::readData()
-{
+void Connection::readData(){ //Handles the incoming data from server
 
 }
 
-void Connection::disconnectedFromServer()
-{
+void Connection::disconnectedFromServer(){ //Connection dropped
     qDebug() << "Disconnected from server, retry connection";
-    if(!retryConnection()){
+    if(!retryConnection()){//Try reconnecting
         qDebug("Cannot re-establish connection");
-        emitSignal(connectionStatus::Disconnected,"Disconnected");
-        emit finished();
+        emitSignal(connectionStatus::Disconnected,"Connection dropped");
+        emit finished();//Exit from thread
     }
 
 }
 
-void Connection::closeConnection()
-{
+void Connection::closeConnection(){//User wants to disconnect through UI
     qDebug() << "Closing connection";
 
     disconnect(socket,SIGNAL(disconnected()),0,0); //Disconnecting, so socket wont emit disconnected()
@@ -110,5 +102,5 @@ void Connection::closeConnection()
 
     qDebug() << "Connection emitting finished";
     emitSignal(connectionStatus::Disconnected,"Disconnected");
-    emit finished();
+    emit finished();//Exit from thread
 }

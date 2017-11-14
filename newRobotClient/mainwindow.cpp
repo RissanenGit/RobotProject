@@ -3,19 +3,16 @@
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow)
-{
+    ui(new Ui::MainWindow){
     ui->setupUi(this);
 }
 
-MainWindow::~MainWindow()
-{
+MainWindow::~MainWindow(){
     delete ui;
 }
 
 ///Functions->
-void MainWindow::connectSignals()
-{
+void MainWindow::connectSignals(){
     connect(thread,SIGNAL(started()),connection,SLOT(createConnection()));
 
     connect(connection,SIGNAL(statusChanged(QString)),this,SLOT(changeStatusLabel(QString)));
@@ -31,14 +28,12 @@ void MainWindow::connectSignals()
 
 
 ///Slots->
-void MainWindow::changeStatusLabel(QString status)
-{
+void MainWindow::changeStatusLabel(QString status){
     ui->statusLabel->setText(status);
 }
 
-void MainWindow::changeConnectionStatus(Connection::connectionStatus status)
-{
-    switch (status) {
+void MainWindow::changeConnectionStatus(Connection::connectionStatus status){
+    switch (status){
     case Connection::connectionStatus::Connected:
         ui->connectButton->setEnabled(true);
         ui->connectButton->setText("Disconnect");
@@ -59,8 +54,7 @@ void MainWindow::changeConnectionStatus(Connection::connectionStatus status)
 }
 
 ///Ui slots->
-void MainWindow::on_connectButton_clicked()
-{
+void MainWindow::on_connectButton_clicked(){
     if(!connected){
         thread = new QThread;
         connection = new Connection();
@@ -73,14 +67,13 @@ void MainWindow::on_connectButton_clicked()
     }
     else{
         emit closeConnection();
-
     }
 }
 
-void MainWindow::threadFinished()
-{
+void MainWindow::threadFinished(){
     qDebug() << "Thread emited finished";
 
+    while(!thread->isFinished()){}
     delete thread;
     delete connection;
 }
