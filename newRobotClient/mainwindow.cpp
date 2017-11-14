@@ -18,8 +18,7 @@ MainWindow::~MainWindow(){
 void MainWindow::connectSignals(){
     connect(thread,SIGNAL(started()),connection,SLOT(createConnection()));
 
-    connect(connection,SIGNAL(statusChanged(QString)),this,SLOT(changeStatusLabel(QString))); //connection->this | Updating statusLabel according to connection status
-    connect(connection,SIGNAL(connectionStatusChanged(Connection::connectionStatus)),this,SLOT(changeConnectionStatus(Connection::connectionStatus))); //connection->this | For updating connection status in UI
+    connect(connection,SIGNAL(connectionStatusChanged(Connection::connectionStatus,QString)),this,SLOT(changeConnectionStatus(Connection::connectionStatus,QString))); //connection->this | For updating connection status in UI
     qRegisterMetaType<Connection::connectionStatus>("Connection::connectionStatus"); //Required for Connection::connectionStatus enum
 
     connect(this,SIGNAL(closeConnection()),connection,SLOT(closeConnection())); //this->connection | Handling closing of stuff inside connection
@@ -36,11 +35,8 @@ void MainWindow::connectSignals(){
 
 
 ///Slots->
-void MainWindow::changeStatusLabel(QString status){
-    ui->statusLabel->setText(status);
-}
-
-void MainWindow::changeConnectionStatus(Connection::connectionStatus status){
+void MainWindow::changeConnectionStatus(Connection::connectionStatus status,QString statusText){
+    ui->statusLabel->setText(statusText);
     switch (status){
     case Connection::connectionStatus::Connected:
         ui->connectButton->setEnabled(true);

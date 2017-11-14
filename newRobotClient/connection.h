@@ -23,11 +23,9 @@ private:
     const int retryTimeout = 5000;
 
     void connectSignals();
-    void emitSignal(connectionStatus status, QString statusText);
     bool retryConnection();
 signals:
-    void statusChanged(QString status);
-    void connectionStatusChanged(Connection::connectionStatus status);
+    void connectionStatusChanged(Connection::connectionStatus status, QString statusText);
     void finished();
     void dataReady(QByteArray data);
 public slots:

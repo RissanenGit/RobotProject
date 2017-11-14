@@ -25,7 +25,7 @@ private:
 
 public slots:
     void changeStatusLabel(QString status);
-    void changeConnectionStatus(Connection::connectionStatus status);
+    void changeConnectionStatus(Connection::connectionStatus status, QString statusText);
     void updateUiValues();
 private slots:
     void on_connectButton_clicked();
