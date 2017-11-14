@@ -11,23 +11,26 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow(){
     delete ui;
+    delete handler;
 }
 
 ///Functions->
 void MainWindow::connectSignals(){
     connect(thread,SIGNAL(started()),connection,SLOT(createConnection()));
 
-    connect(connection,SIGNAL(statusChanged(QString)),this,SLOT(changeStatusLabel(QString)));
-    connect(connection,SIGNAL(connectionStatusChanged(Connection::connectionStatus)),this,SLOT(changeConnectionStatus(Connection::connectionStatus)));
-    qRegisterMetaType<Connection::connectionStatus>("Connection::connectionStatus");
+    connect(connection,SIGNAL(statusChanged(QString)),this,SLOT(changeStatusLabel(QString))); //connection->this | Updating statusLabel according to connection status
+    connect(connection,SIGNAL(connectionStatusChanged(Connection::connectionStatus)),this,SLOT(changeConnectionStatus(Connection::connectionStatus))); //connection->this | For updating connection status in UI
+    qRegisterMetaType<Connection::connectionStatus>("Connection::connectionStatus"); //Required for Connection::connectionStatus enum
 
-    //Finishing the thread
-    connect(this,SIGNAL(closeConnection()),connection,SLOT(closeConnection()));
+    connect(this,SIGNAL(closeConnection()),connection,SLOT(closeConnection())); //this->connection | Handling closing of stuff inside connection
 
-    connect(connection,SIGNAL(finished()),thread,SLOT(quit()));
-    connect(thread,SIGNAL(finished()),this,SLOT(threadFinished()));
+    connect(connection,SIGNAL(finished()),thread,SLOT(quit())); //connection->thread | Connection emits finished, thread quits
+    connect(thread,SIGNAL(finished()),this,SLOT(threadFinished())); //thread->this | Thread emits finished, delete thread and connection
 
-    connect(connection,SIGNAL(dataReady(QByteArray)),handler,SLOT(parseData(QByteArray)));
+    connect(connection,SIGNAL(dataReady(QByteArray)),handler,SLOT(parseData(QByteArray))); //connection->handler | Data is ready at socket, send it to DataHandler
+
+    connect(handler,SIGNAL(updateValues()),this,SLOT(updateUiValues())); //handler->this | Temporary for displaying values in UI
+    connect(handler,SIGNAL(sendMessage(QByteArray)),connection,SLOT(sendData(QByteArray))); //handler->connection | Temporary for sending messages via socket
 
 }
 
@@ -56,6 +59,14 @@ void MainWindow::changeConnectionStatus(Connection::connectionStatus status){
     default:
         break;
     }
+}
+
+void MainWindow::updateUiValues()
+{
+    qDebug() << "Update ui";
+    ui->batteryLabel->setText(QString::number((handler->batteryLevel())));
+    ui->actionLabel->setText(handler->action());
+    ui->taskLabel->setText(handler->task());
 }
 void MainWindow::threadFinished(){
     while(!thread->isFinished()){}
@@ -86,5 +97,7 @@ void MainWindow::on_connectButton_clicked(){
 
 void MainWindow::on_connectButton_2_clicked()
 {
-    qDebug() << "TestiNappula pressed";
+    qDebug() << "TestiNappula pressed, sent message to server";
+
+    handler->createMessage();
 }

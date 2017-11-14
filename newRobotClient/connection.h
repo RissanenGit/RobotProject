@@ -33,8 +33,10 @@ signals:
 public slots:
     void createConnection();
     void readData();
+    void sendData(QByteArray data);
     void disconnectedFromServer();
     void closeConnection();
+
 };
 
 #endif // CONNECTION_H

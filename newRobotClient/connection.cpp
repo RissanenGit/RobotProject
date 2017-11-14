@@ -84,6 +84,11 @@ void Connection::readData(){ //Handles the incoming data from server
     emit dataReady(socket->readAll());
 }
 
+void Connection::sendData(QByteArray data){
+    qDebug() << "Sending data to socket";
+    socket->write(data);
+}
+
 void Connection::disconnectedFromServer(){ //Connection dropped
     qDebug() << "Disconnected from server, retry connection";
     if(!retryConnection()){//Try reconnecting

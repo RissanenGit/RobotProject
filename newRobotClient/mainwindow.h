@@ -26,11 +26,12 @@ private:
 public slots:
     void changeStatusLabel(QString status);
     void changeConnectionStatus(Connection::connectionStatus status);
+    void updateUiValues();
 private slots:
     void on_connectButton_clicked();
-    void threadFinished();
-
     void on_connectButton_2_clicked();
+
+    void threadFinished();
 
 private:
     Ui::MainWindow *ui;
