@@ -5,7 +5,7 @@ Connection::Connection(QObject *parent, QString address, qint16 port) : QObject(
     this->port = port;
 }
 
-Connection::~Connection(){ //Socket is deleted when connection is deleted in main thread
+Connection::~Connection(){ //Socket is deleted when connection is deleted in the main thread
         qDebug() << "Socket deleted";
         delete socket;
         socket = nullptr;
@@ -14,25 +14,25 @@ Connection::~Connection(){ //Socket is deleted when connection is deleted in mai
 
 ///Functions->
 void Connection::connectSignals(){ //Handles connecting all the necessary signals
-    //connect(socket,SIGNAL(readyRead()),this,SLOT(readData()));
+    connect(socket,SIGNAL(readyRead()),this,SLOT(readData()));
     connect(socket,SIGNAL(disconnected()),this,SLOT(disconnectedFromServer()));
 
     qDebug() << "Connected signals";
 }
 
-void Connection::emitSignal(Connection::connectionStatus status, QString statusText){ //Handles the updating of certain UI elements
+void Connection::emitSignal(connectionStatus status, QString statusText){ //Handles the updating of certain UI elements
     switch (status) {
     case connectionStatus::Connected:
         emit statusChanged(statusText);
-        emit connectionStatusChanged(Connection::connectionStatus::Connected);
+        emit connectionStatusChanged(connectionStatus::Connected);
         break;
     case connectionStatus::Disconnected:
         emit statusChanged(statusText);
-        emit connectionStatusChanged(Connection::connectionStatus::Disconnected);
+        emit connectionStatusChanged(connectionStatus::Disconnected);
         break;
     case connectionStatus::Connecting:
         emit statusChanged(statusText);
-        emit connectionStatusChanged(Connection::connectionStatus::Connecting);
+        emit connectionStatusChanged(connectionStatus::Connecting);
         break;
     default:
         break;
@@ -80,7 +80,8 @@ void Connection::createConnection(){ //Entrypoint
 }
 
 void Connection::readData(){ //Handles the incoming data from server
-
+    qDebug() << "Reading data from socket";
+    emit dataReady(socket->readAll());
 }
 
 void Connection::disconnectedFromServer(){ //Connection dropped
@@ -88,6 +89,7 @@ void Connection::disconnectedFromServer(){ //Connection dropped
     if(!retryConnection()){//Try reconnecting
         qDebug("Cannot re-establish connection");
         emitSignal(connectionStatus::Disconnected,"Connection dropped");
+        qDebug() << "Connection emitting finished";
         emit finished();//Exit from thread
     }
 

@@ -29,6 +29,7 @@ signals:
     void statusChanged(QString status);
     void connectionStatusChanged(Connection::connectionStatus status);
     void finished();
+    void dataReady(QByteArray data);
 public slots:
     void createConnection();
     void readData();

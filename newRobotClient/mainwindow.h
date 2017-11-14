@@ -5,6 +5,8 @@
 #include <QThread>
 
 #include <connection.h>
+#include <datahandler.h>
+
 namespace Ui {
 class MainWindow;
 }
@@ -28,11 +30,15 @@ private slots:
     void on_connectButton_clicked();
     void threadFinished();
 
+    void on_connectButton_2_clicked();
+
 private:
     Ui::MainWindow *ui;
 
     QThread *thread;
     Connection *connection;
+
+    DataHandler *handler;
 
     bool connected = false;
 

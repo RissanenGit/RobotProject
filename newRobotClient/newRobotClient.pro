@@ -26,11 +26,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
-    connection.cpp
+    connection.cpp \
+    datahandler.cpp
 
 HEADERS += \
         mainwindow.h \
-    connection.h
+    connection.h \
+    datahandler.h
 
 FORMS += \
         mainwindow.ui
