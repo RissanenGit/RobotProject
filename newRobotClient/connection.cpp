@@ -16,20 +16,23 @@ Connection::~Connection(){ //Socket is deleted when connection is deleted in the
 void Connection::connectSignals(){ //Handles connecting all the necessary signals
     connect(socket,SIGNAL(readyRead()),this,SLOT(readData()));
     connect(socket,SIGNAL(disconnected()),this,SLOT(disconnectedFromServer()));
-
     qDebug() << "Connected signals";
+}
+void Connection::disconnectSignals(){
+    disconnect(socket,SIGNAL(readyRead()),0,0);
+    disconnect(socket,SIGNAL(disconnected()),0,0);
 }
 
 bool Connection::retryConnection(){ //Handles reconnecting to the server
 
-    emit connectionStatusChanged(connectionStatus::Connecting,"Connection lost");
-    QThread::msleep(5000);
+    emit connectionStatusChanged(connectionStatus::Connecting,"Connecting...");
+    QThread::msleep(retryTimeout);
 
     for(int i = 0;i < retryCount; i++){ //Try (5) times to connect to the server
         qDebug() << "Retry " << i + 1;
-        emit connectionStatusChanged(connectionStatus::Connecting,QStringLiteral("Reconnecting... (Retry: %1)").arg(i + 1));//Update UI on the reconnection status
+        emit connectionStatusChanged(connectionStatus::Connecting,QStringLiteral("Connecting... (Retry: %1)").arg(i + 1));//Update UI on the reconnection status
         QThread::msleep(retryTimeout); //Sleep for 5 seconds, give time for the server to come up
-
+        socket->disconnectFromHost();
         socket->connectToHost(address,port);
         if(socket->waitForConnected(5000)){
             qDebug() << "Connection re-established";
@@ -64,18 +67,27 @@ void Connection::createConnection(){ //Entrypoint
 }
 
 void Connection::readData(){ //Handles the incoming data from server
-    qDebug() << "Reading data from socket";
-    emit dataReady(socket->readAll());
+    //qDebug() << "Reading data from socket";
+    //emit dataReady(socket->readAll());
 }
 
 void Connection::sendData(QByteArray data){
-    qDebug() << "Sending data to socket";
+    qDebug() << "Sending data to socket: " << data;
+    qDebug() << "Socket: " << socket;
+    qDebug() << "Data address: " << &data;
     socket->write(data);
 }
 
 void Connection::disconnectedFromServer(){ //Connection dropped
     qDebug() << "Disconnected from server, retry connection";
-    if(!retryConnection()){//Try reconnecting
+    disconnectSignals();
+
+    if(!retry){
+        emit connectionStatusChanged(connectionStatus::Disconnected,"Connection dropped");
+        qDebug() << "Connection emitting finished";
+        emit finished();//Exit from thread
+    }
+    if(retry && !retryConnection()){//Try reconnecting
         qDebug("Cannot re-establish connection");
         emit connectionStatusChanged(connectionStatus::Disconnected,"Connection dropped");
         qDebug() << "Connection emitting finished";
@@ -87,7 +99,7 @@ void Connection::disconnectedFromServer(){ //Connection dropped
 void Connection::closeConnection(){//User wants to disconnect through UI
     qDebug() << "Closing connection";
 
-    disconnect(socket,SIGNAL(disconnected()),0,0); //Disconnecting, so socket wont emit disconnected()
+    disconnectSignals(); //Disconnecting, so socket wont emit disconnected()
 
     socket->close();
 
@@ -95,3 +107,4 @@ void Connection::closeConnection(){//User wants to disconnect through UI
     emit connectionStatusChanged(connectionStatus::Disconnected,"Disconnected");
     emit finished();//Exit from thread
 }
+

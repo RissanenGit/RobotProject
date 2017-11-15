@@ -10,7 +10,7 @@ void DataHandler::createMessage()
 }
 
 void DataHandler::parseData(QByteArray data){
-    qDebug() << "Data from socket (DataHandler)";
+    //qDebug() << "Data from socket (DataHandler)";
 
     QList<QByteArray>content = data.split('\n');
 
@@ -31,7 +31,7 @@ void DataHandler::parseData(QByteArray data){
             }
         }
     }
-    qDebug() << "BatteryLevel:" << QString::number(_batteryLevel) << "Action:" << _action << "Task:" << _task;
+    //qDebug() << "BatteryLevel:" << QString::number(_batteryLevel) << "Action:" << _action << "Task:" << _task;
     emit updateValues();
 
 }

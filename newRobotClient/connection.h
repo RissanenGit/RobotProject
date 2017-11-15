@@ -21,8 +21,10 @@ private:
 
     const int retryCount = 5;
     const int retryTimeout = 5000;
+    bool retry = false; //socket.write not working after reconnect
 
     void connectSignals();
+    void disconnectSignals();
     bool retryConnection();
 signals:
     void connectionStatusChanged(Connection::connectionStatus status, QString statusText);

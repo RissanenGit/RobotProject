@@ -5,13 +5,10 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow){
     ui->setupUi(this);
-
-    handler = new DataHandler();
 }
 
 MainWindow::~MainWindow(){
     delete ui;
-    delete handler;
 }
 
 ///Functions->
@@ -59,7 +56,7 @@ void MainWindow::changeConnectionStatus(Connection::connectionStatus status,QStr
 
 void MainWindow::updateUiValues()
 {
-    qDebug() << "Update ui";
+    //qDebug() << "Update ui";
     ui->batteryLabel->setText(QString::number((handler->batteryLevel())));
     ui->actionLabel->setText(handler->action());
     ui->taskLabel->setText(handler->task());
@@ -71,14 +68,16 @@ void MainWindow::threadFinished(){
 
     delete thread;
     delete connection;
+    delete handler;
 }
 
 
 ///Ui slots->
 void MainWindow::on_connectButton_clicked(){
     if(!connected){
-        thread = new QThread;
-        connection = new Connection();
+        thread = new QThread();
+        connection = new Connection(nullptr,ui->connectionInfoLabel->text().split(":")[0],ui->connectionInfoLabel->text().split(":")[1].toInt());
+        handler = new DataHandler();
 
         connection->moveToThread(thread);
         connectSignals();
@@ -93,7 +92,7 @@ void MainWindow::on_connectButton_clicked(){
 
 void MainWindow::on_connectButton_2_clicked()
 {
-    qDebug() << "TestiNappula pressed, sent message to server";
+    //qDebug() << "TestiNappula pressed, sent message to server";
 
     handler->createMessage();
 }
