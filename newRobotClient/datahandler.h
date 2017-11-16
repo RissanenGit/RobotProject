@@ -20,7 +20,7 @@ public:
     QString action(){return _action;}
 
     void createMessage(messageTypes messageType);
-    void logEvent(eventType event, QList<QString> eventData);
+    void logEvent(eventType event, QList<QString> eventData = QList<QString>());
 private:
     int _batteryLevel;
     QString _task;

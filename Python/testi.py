@@ -38,23 +38,6 @@ class SomeClass(threading.Thread):
     def getLoopCount(self):
         return self.loopcount
 
-
-    """
-        def run(self):
-            while True:
-                if self.end:
-                    print(self.threadname + " : ENDING")
-                    break;
-                try:
-                    function, args = self.q.get(timeout=self.timeout)
-                    function(*args)
-                except queue.Empty:
-                    self.idle()"""
-
-
-
-
-
 import time
 
 thread = SomeClass("Thread1")
@@ -71,14 +54,3 @@ print(toinenThread.getLoopCount())
 time.sleep(1)
 print(toinenThread.getLoopCount())
 toinenThread.endThread()
-"""
-thread.onThread(SomeClass.printData,"Datis")
-toinenThread.onThread(SomeClass.printData,"Datis2")
-time.sleep(2)
-
-print("Thread1 loopcount: ",thread.getLoopCount())
-print("Thraed2 loopcount: ",toinenThread.getLoopCount())
-
-thread.onThread(SomeClass.endThread)
-toinenThread.onThread(SomeClass.endThread)
-"""

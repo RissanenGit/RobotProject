@@ -53,7 +53,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>TestiNappula</string>
+     <string>Send Command</string>
     </property>
    </widget>
    <widget class="QLabel" name="label">

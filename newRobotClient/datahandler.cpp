@@ -70,7 +70,7 @@ void DataHandler::parseData(QByteArray data){
             }
         }
     }
-    logEvent(ReceivedData,QList<QString>{});
+    logEvent(ReceivedData);
     emit updateValues();
 
 }
