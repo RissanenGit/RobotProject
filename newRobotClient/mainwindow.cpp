@@ -28,25 +28,31 @@ void MainWindow::connectSignals(){
     connect(handler,SIGNAL(updateValues()),this,SLOT(updateUiValues())); //handler->this | Temporary for displaying values in UI
     connect(handler,SIGNAL(sendMessage(QByteArray)),connection,SLOT(sendData(QByteArray))); //handler->connection | Temporary for sending messages via socket
 
+    connect(handler,SIGNAL(sendLogData(QString)),this,SLOT(updateLog(QString)));
+
 }
-
-
 ///Slots->
 void MainWindow::changeConnectionStatus(Connection::connectionStatus status,QString statusText){
     ui->statusLabel->setText(statusText);
     switch (status){
-    case Connection::connectionStatus::Connected:
+    case Connection::Connected:
+        handler->logEvent(DataHandler::Connected,QList<QString>{ipAddress, "Testi"});
+        ui->connectButton_2->setEnabled(true);
         ui->connectButton->setEnabled(true);
         ui->connectButton->setText("Disconnect");
         connected = true;
         break;
-    case Connection::connectionStatus::Disconnected:
+    case Connection::Disconnected:
+        handler->logEvent(DataHandler::Disconnected,QList<QString>{ipAddress, "Testi", "Testi", "Testi"});
         ui->connectButton->setEnabled(true);
+        ui->connectButton_2->setEnabled(false);
         ui->connectButton->setText("Connect");
         connected = false;
         break;
-    case Connection::connectionStatus::Connecting:
+    case Connection::Connecting:
+        handler->logEvent(DataHandler::Connecting,QList<QString>{ipAddress});
         ui->connectButton->setEnabled(false);
+        ui->connectButton_2->setEnabled(false);
         ui->connectButton->setText("Connecting");
         break;
     default:
@@ -56,10 +62,13 @@ void MainWindow::changeConnectionStatus(Connection::connectionStatus status,QStr
 
 void MainWindow::updateUiValues()
 {
-    //qDebug() << "Update ui";
     ui->batteryLabel->setText(QString::number((handler->batteryLevel())));
     ui->actionLabel->setText(handler->action());
     ui->taskLabel->setText(handler->task());
+}
+void MainWindow::updateLog(QString data)
+{
+    ui->logView->append(data);
 }
 void MainWindow::threadFinished(){
     while(!thread->isFinished()){}
@@ -75,8 +84,12 @@ void MainWindow::threadFinished(){
 ///Ui slots->
 void MainWindow::on_connectButton_clicked(){
     if(!connected){
+
+        ipAddress = ui->connectionInfoLabel->text().split(":")[0];
+        port = ui->connectionInfoLabel->text().split(":")[1].toInt();
+
         thread = new QThread();
-        connection = new Connection(nullptr,ui->connectionInfoLabel->text().split(":")[0],ui->connectionInfoLabel->text().split(":")[1].toInt());
+        connection = new Connection(nullptr,ipAddress,port);
         handler = new DataHandler();
 
         connection->moveToThread(thread);
@@ -92,7 +105,14 @@ void MainWindow::on_connectButton_clicked(){
 
 void MainWindow::on_connectButton_2_clicked()
 {
-    //qDebug() << "TestiNappula pressed, sent message to server";
-
-    handler->createMessage();
+    switch (ui->commandBox->currentIndex()) {
+    case DataHandler::Halt:
+        handler->createMessage(DataHandler::Halt);
+        break;
+    case DataHandler::Return:
+        handler->createMessage(DataHandler::Return);
+        break;
+    default:
+        break;
+    }
 }

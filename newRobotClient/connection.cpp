@@ -24,7 +24,6 @@ void Connection::disconnectSignals(){
 }
 
 bool Connection::retryConnection(){ //Handles reconnecting to the server
-
     emit connectionStatusChanged(connectionStatus::Connecting,"Connecting...");
     QThread::msleep(retryTimeout);
 
@@ -32,7 +31,6 @@ bool Connection::retryConnection(){ //Handles reconnecting to the server
         qDebug() << "Retry " << i + 1;
         emit connectionStatusChanged(connectionStatus::Connecting,QStringLiteral("Connecting... (Retry: %1)").arg(i + 1));//Update UI on the reconnection status
         QThread::msleep(retryTimeout); //Sleep for 5 seconds, give time for the server to come up
-        socket->disconnectFromHost();
         socket->connectToHost(address,port);
         if(socket->waitForConnected(5000)){
             qDebug() << "Connection re-established";
@@ -68,13 +66,14 @@ void Connection::createConnection(){ //Entrypoint
 
 void Connection::readData(){ //Handles the incoming data from server
     //qDebug() << "Reading data from socket";
-    //emit dataReady(socket->readAll());
+    emit dataReady(socket->readAll());
 }
 
 void Connection::sendData(QByteArray data){
     qDebug() << "Sending data to socket: " << data;
-    qDebug() << "Socket: " << socket;
-    qDebug() << "Data address: " << &data;
+    //qDebug() << "Socket: " << socket;
+    //qDebug() << "Data address: " << &data;
+
     socket->write(data);
 }
 

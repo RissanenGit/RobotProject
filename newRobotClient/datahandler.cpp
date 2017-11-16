@@ -4,26 +4,65 @@ DataHandler::DataHandler(QObject *parent) : QObject(parent){
 }
 DataHandler::~DataHandler(){}
 
-void DataHandler::createMessage()
+void DataHandler::logEvent(eventType event, QList<QString> eventData)
 {
-    emit sendMessage("Command:HALT!");
+    QString message = "";
+    switch (event) {
+    case Connected:
+        message = "Connected to Server";
+        break;
+    case Connecting:
+        message = "Connecting to Server";
+        break;
+    case Disconnected:
+        message = "Disconnected from Server";
+        break;
+    case SentData:
+        message = "Sent Data to Server";
+        break;
+    case ReceivedData:
+        message = "Received Data From Server ";
+        break;
+    default:
+        break;
+    }
+    for(int i = 0; i < eventData.length(); i++){
+        message += "(" + eventData[i] + ")";
+    }
+    emit sendLogData(QStringLiteral("[%1] %2").arg(QDateTime::currentDateTime().toString("HH:mm:ss")).arg(message));
+}
+
+void DataHandler::createMessage(messageTypes messageType)
+{
+    QByteArray message = "";
+    switch (messageType) {
+    case Halt:
+        message = "Command:Halt";
+        break;
+    case Return:
+        message = "Command:Return";
+        break;
+    default:
+        break;
+    }
+    logEvent(SentData,QList<QString>{message});
+    emit sendMessage(message);
 }
 
 void DataHandler::parseData(QByteArray data){
-    //qDebug() << "Data from socket (DataHandler)";
 
     QList<QByteArray>content = data.split('\n');
 
     for(int i = 0; i < content.length() - 1; i++){
         if(content[i].split(':').length() > 0){
             switch (content[i].split(':')[0].toInt()) {
-            case dataTypes::BatteryLevel:
+            case BatteryLevel:
                 _batteryLevel = content[i].split(':')[1].toInt();
                 break;
-            case dataTypes::Action:
+            case Action:
                 _action = content[i].split(':')[1];
                 break;
-            case dataTypes::Task:
+            case Task:
                 _task = content[i].split(':')[1];
                 break;
             default:
@@ -31,7 +70,7 @@ void DataHandler::parseData(QByteArray data){
             }
         }
     }
-    //qDebug() << "BatteryLevel:" << QString::number(_batteryLevel) << "Action:" << _action << "Task:" << _task;
+    logEvent(ReceivedData,QList<QString>{});
     emit updateValues();
 
 }
