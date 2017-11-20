@@ -38,7 +38,7 @@ class RobotServer(threading.Thread):
         self.serverSocket.listen(True)
         while True: #Outer loop | Wait for client to connect
             connection,address = self.serverSocket.accept()
-            connection.settimeout(1)
+            connection.settimeout(1) #Set timeout for receiving data
             print("Connection from: ", address)
 
             while True: #Inner loop | Handle sending and receiving data to/from client
@@ -55,7 +55,7 @@ class RobotServer(threading.Thread):
                         connection.close()
                         break
                 except socket.error as error: #Socket timeout in receiving data
-                    print(error)
-                    continue
+                    pass
                 time.sleep(1)
+
             print("Client disconnected: ", address) #Exited from inner loop, client disconnected

@@ -55,18 +55,15 @@ void DataHandler::parseData(QByteArray data){
 
     for(int i = 0; i < content.length() - 1; i++){
         if(content[i].split(':').length() > 0){
-            switch (content[i].split(':')[0].toInt()) {
-            case BatteryLevel:
+            QString event = content[i].split(':')[0];
+            if(event == "BatteryLevel"){
                 _batteryLevel = content[i].split(':')[1].toInt();
-                break;
-            case Action:
+            }
+            else if(event == "Action"){
                 _action = content[i].split(':')[1];
-                break;
-            case Task:
+            }
+            else if (event == "Task"){
                 _task = content[i].split(':')[1];
-                break;
-            default:
-                break;
             }
         }
     }

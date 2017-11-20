@@ -2,6 +2,7 @@ import threading
 import RobotServer
 import time
 import Queue
+import DataParser
 
 mainQueue = Queue.Queue()
 
@@ -9,7 +10,7 @@ serverThread = RobotServer.RobotServer(mainQueue)
 serverThread.setDaemon(True)
 serverThread.start()
 
-dataMuuttuja = ""
+data = {"BatteryLevel" : 100, "Action" : "MovingLeft", "Task": "DeliveringItems"}
 
 def checkQueue():
     try:
@@ -19,5 +20,5 @@ def checkQueue():
 
 while True:
     checkQueue()
-    serverThread.insertServerQueue(serverThread.setMessage,raw_input("Message: "))
+    serverThread.insertServerQueue(serverThread.sendData,DataParser.createDataPacket(data))
     continue
