@@ -1,10 +1,11 @@
 def parseData(data):
     parsedData = {}
-
-    for command in data.split(','):
-        parsedData[command.split(':')[0]] = command.split(':')[1]
-
-    return parsedData
+    try:
+        for command in data.split(','):
+            parsedData[command.split(':')[0]] = command.split(':')[1]
+            return parsedData
+    except Exception:
+        return False
 
 def createDataPacket(data):
     packet = ""

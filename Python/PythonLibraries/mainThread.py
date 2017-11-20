@@ -15,10 +15,9 @@ data = {"BatteryLevel" : 100, "Action" : "MovingLeft", "Task": "DeliveringItems"
 def checkQueue():
     try:
         print(mainQueue.get(timeout=0.5))
-    except Exception:
+    except Queue.Empty:
         return
 
 while True:
     checkQueue()
     serverThread.insertServerQueue(serverThread.sendData,DataParser.createDataPacket(data))
-    continue
