@@ -6,6 +6,7 @@
 #include <QInputDialog>
 #include <QAction>
 #include <QMessageBox>
+#include <QMap>
 
 #include <connection.h>
 #include <datahandler.h>
@@ -24,9 +25,14 @@ public:
     ~MainWindow();
 private:
     void connectSignals();
+    void showMessageBox(QString title, QString message);
 
     QString ipAddress;
     qint16 port;
+    enum errorTypes{LowBattery};
+    QMap<errorTypes,bool> errorList {{LowBattery,false}};
+
+    const int lowBatteryLevel = 30;
 public slots:
     void changeConnectionStatus(Connection::connectionStatus status, QString statusText);
     void updateUiValues();

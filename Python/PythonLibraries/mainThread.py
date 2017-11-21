@@ -21,3 +21,4 @@ def checkQueue():
 while True:
     checkQueue()
     serverThread.insertServerQueue(serverThread.sendData,DataParser.createDataPacket(data))
+    data["BatteryLevel"] = data["BatteryLevel"] - 2

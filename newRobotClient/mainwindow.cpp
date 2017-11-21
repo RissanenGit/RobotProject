@@ -44,10 +44,22 @@ void MainWindow::connectSignals(){
     connect(handler,SIGNAL(sendLogData(QString)),this,SLOT(updateLog(QString))); //For data logging
 
 }
+
+void MainWindow::showMessageBox(QString title,QString message){
+    QMessageBox msgBox;
+    msgBox.setWindowTitle(title);
+    msgBox.setText(message);
+    msgBox.exec();
+}
 ///Slots->
 void MainWindow::changeConnectionStatus(Connection::connectionStatus status,QString statusText){
     ui->statusLabel->setText(statusText);
     switch (status){
+    case Connection::Connecting:
+        handler->logEvent(DataHandler::Connecting,QList<QString>{ipAddress});
+        ui->menuConnect->setEnabled(false);
+        ui->menuCommand->setEnabled(false);
+        break;
     case Connection::Connected:
         handler->logEvent(DataHandler::Connected,QList<QString>{ipAddress, "Testi"});
         ui->menuConnect->setEnabled(true);
@@ -62,21 +74,32 @@ void MainWindow::changeConnectionStatus(Connection::connectionStatus status,QStr
         ui->actionConnect->setText("Connect");
         connected = false;
         break;
-    case Connection::Connecting:
-        handler->logEvent(DataHandler::Connecting,QList<QString>{ipAddress});
-        ui->menuConnect->setEnabled(false);
+    case Connection::ConnectionDropped:
+        handler->logEvent(DataHandler::Disconnected,QList<QString>{ipAddress,"Connection Dropped"});
+        ui->menuConnect->setEnabled(true);
         ui->menuCommand->setEnabled(false);
+        ui->actionConnect->setText("Connect");
+
+        showMessageBox("Error","Connection Dropped");
         break;
     default:
         break;
     }
 }
 
-void MainWindow::updateUiValues()
-{
+void MainWindow::updateUiValues(){
     ui->batteryLabel->setText(QString::number((handler->batteryLevel())));
     ui->actionLabel->setText(handler->action());
     ui->taskLabel->setText(handler->task());
+
+    //Check battery level
+    if(handler->batteryLevel() < lowBatteryLevel && errorList[LowBattery] != true){
+        showMessageBox("Warning","Low Battery on Robot");
+        errorList[LowBattery] = true;
+    }
+    else if(handler->batteryLevel() > lowBatteryLevel + 20){
+        errorList[LowBattery] = false;
+    }
 }
 void MainWindow::updateLog(QString data)
 {
@@ -110,12 +133,12 @@ void MainWindow::sendSpeed(){
 void MainWindow::connectClicked()
 {
     if(!connected){
-        QString text = QInputDialog::getText(this, tr("Enter IP:PORT"),tr("Address:"), QLineEdit::Normal);
+        bool ok;
+        QString text = QInputDialog::getText(this, tr("Enter IP:PORT"),tr("Address:"), QLineEdit::Normal,"192.168.1.63:9999",&ok);
+        if(!ok){return;}
+
         if(text.indexOf(':') == -1){
-            QMessageBox msgBox;
-            msgBox.setWindowTitle("Invalid address");
-            msgBox.setText("Invalid address");
-            msgBox.exec();
+            showMessageBox("Error", "Incorrect address entered");
             return;
         }
         ipAddress = text.split(":")[0];
@@ -136,14 +159,6 @@ void MainWindow::connectClicked()
     }
 }
 
-void MainWindow::showHelp(){
-    QMessageBox msgBox;
-    msgBox.setText("How to use text here");
-    msgBox.exec();
-}
+void MainWindow::showHelp(){showMessageBox("Usage", "Help text goes here");}
 
-void MainWindow::showAbout(){
-    QMessageBox msgBox;
-    msgBox.setText("About text here");
-    msgBox.exec();
-}
+void MainWindow::showAbout(){showMessageBox("About", "About text goes here");}

@@ -13,7 +13,7 @@ public:
     explicit Connection(QObject *parent = nullptr,QString address = "127.0.0.1", qint16 port = 9999);
     ~Connection();
 
-    enum connectionStatus{Connected,Disconnected,Connecting};
+    enum connectionStatus{Connected,Disconnected,Connecting,ConnectionDropped};
 private:
     QTcpSocket *socket;
     QString address;
