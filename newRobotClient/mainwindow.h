@@ -34,12 +34,16 @@ public slots:
 private slots:
     //UI
     void connectClicked();
+    void showHelp();
+    void showAbout();
 
     void threadFinished();
     void sendHalt();
     void sendReturn();
     void sendRelease();
     void sendSpeed();
+
+
 private:
     Ui::MainWindow *ui;
 

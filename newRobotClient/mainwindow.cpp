@@ -15,6 +15,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionRelease,SIGNAL(triggered(bool)),this,SLOT(sendRelease()));
     connect(ui->actionSetSpeed,SIGNAL(triggered(bool)),this,SLOT(sendSpeed()));
 
+    connect(ui->actionAbout,SIGNAL(triggered(bool)),this,SLOT(showAbout()));
+    connect(ui->actionUsage,SIGNAL(triggered(bool)),this,SLOT(showHelp()));
+
 }
 
 MainWindow::~MainWindow(){
@@ -96,6 +99,7 @@ void MainWindow::sendSpeed(){
     bool ok;
     QString message = QStringLiteral("New speed: (Current: %1 )").arg(handler->speed());
     int speed = QInputDialog::getInt(this,message,tr("Speed:"), QLineEdit::Normal,0,100,1,&ok);
+
     if(ok){
         handler->createMessage(DataHandler::SetSpeed,QString::number(speed));
     }
@@ -130,4 +134,16 @@ void MainWindow::connectClicked()
     else{
         emit closeConnection();
     }
+}
+
+void MainWindow::showHelp(){
+    QMessageBox msgBox;
+    msgBox.setText("How to use text here");
+    msgBox.exec();
+}
+
+void MainWindow::showAbout(){
+    QMessageBox msgBox;
+    msgBox.setText("About text here");
+    msgBox.exec();
 }

@@ -24,9 +24,8 @@ void Connection::disconnectSignals(){
 }
 
 bool Connection::retryConnection(){ //Handles reconnecting to the server
-    emit connectionStatusChanged(connectionStatus::Connecting,"Connecting...");
-    QThread::msleep(retryTimeout);
 
+    QThread::msleep(retryTimeout);
     for(int i = 0;i < retryCount; i++){ //Try (5) times to connect to the server
         qDebug() << "Retry " << i + 1;
         emit connectionStatusChanged(connectionStatus::Connecting,QStringLiteral("Connecting... (Retry: %1)").arg(i + 1));//Update UI on the reconnection status
