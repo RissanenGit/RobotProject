@@ -14,46 +14,22 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <widget class="QPushButton" name="connectButton">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>0</y>
-      <width>121</width>
-      <height>51</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Connect</string>
-    </property>
-   </widget>
    <widget class="QLabel" name="statusLabel">
     <property name="geometry">
      <rect>
-      <x>0</x>
-      <y>400</y>
-      <width>211</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="connectButton_2">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>70</y>
-      <width>121</width>
+      <x>10</x>
+      <y>10</y>
+      <width>331</width>
       <height>51</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <pointsize>20</pointsize>
+     </font>
+    </property>
     <property name="text">
-     <string>Send Command</string>
+     <string>Not Connected</string>
     </property>
    </widget>
    <widget class="QLabel" name="label">
@@ -134,46 +110,13 @@
      <string/>
     </property>
    </widget>
-   <widget class="QLineEdit" name="connectionInfoLabel">
-    <property name="geometry">
-     <rect>
-      <x>140</x>
-      <y>10</y>
-      <width>151</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>127.0.0.1:9999</string>
-    </property>
-   </widget>
-   <widget class="QComboBox" name="commandBox">
-    <property name="geometry">
-     <rect>
-      <x>140</x>
-      <y>70</y>
-      <width>86</width>
-      <height>25</height>
-     </rect>
-    </property>
-    <item>
-     <property name="text">
-      <string>Halt</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>Return</string>
-     </property>
-    </item>
-   </widget>
    <widget class="QTextBrowser" name="logView">
     <property name="geometry">
      <rect>
-      <x>240</x>
-      <y>230</y>
-      <width>501</width>
-      <height>201</height>
+      <x>10</x>
+      <y>200</y>
+      <width>731</width>
+      <height>231</height>
      </rect>
     </property>
    </widget>
@@ -187,16 +130,59 @@
      <height>22</height>
     </rect>
    </property>
-  </widget>
-  <widget class="QToolBar" name="mainToolBar">
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
+   <widget class="QMenu" name="menuConnect">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionConnect"/>
+    <addaction name="actionExit"/>
+   </widget>
+   <widget class="QMenu" name="menuCommand">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="title">
+     <string>Commands</string>
+    </property>
+    <addaction name="actionHalt"/>
+    <addaction name="actionReturn"/>
+    <addaction name="actionRelease"/>
+    <addaction name="actionSetSpeed"/>
+   </widget>
+   <addaction name="menuConnect"/>
+   <addaction name="menuCommand"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
+  <action name="actionConnect">
+   <property name="text">
+    <string>Connect</string>
+   </property>
+  </action>
+  <action name="actionHalt">
+   <property name="text">
+    <string>Halt</string>
+   </property>
+  </action>
+  <action name="actionReturn">
+   <property name="text">
+    <string>Return</string>
+   </property>
+  </action>
+  <action name="actionRelease">
+   <property name="text">
+    <string>Release</string>
+   </property>
+  </action>
+  <action name="actionSetSpeed">
+   <property name="text">
+    <string>SetSpeed</string>
+   </property>
+  </action>
+  <action name="actionExit">
+   <property name="text">
+    <string>Exit</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>

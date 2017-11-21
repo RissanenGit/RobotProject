@@ -32,7 +32,7 @@ void DataHandler::logEvent(eventType event, QList<QString> eventData)
     emit sendLogData(QStringLiteral("[%1] %2").arg(QDateTime::currentDateTime().toString("HH:mm:ss")).arg(message));
 }
 
-void DataHandler::createMessage(messageTypes messageType)
+void DataHandler::createMessage(messageTypes messageType, QString additionalData)
 {
     QByteArray message = "";
     switch (messageType) {
@@ -42,6 +42,12 @@ void DataHandler::createMessage(messageTypes messageType)
     case Return:
         message = "Command:Return";
         break;
+    case Release:
+        message = "Command:Release";
+        break;
+    case SetSpeed:
+        message = "Command:SetSpeed:";
+        message += additionalData;
     default:
         break;
     }

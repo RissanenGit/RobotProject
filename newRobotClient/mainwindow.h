@@ -3,9 +3,13 @@
 
 #include <QMainWindow>
 #include <QThread>
+#include <QInputDialog>
+#include <QAction>
+#include <QMessageBox>
 
 #include <connection.h>
 #include <datahandler.h>
+
 
 namespace Ui {
 class MainWindow;
@@ -28,12 +32,14 @@ public slots:
     void updateUiValues();
     void updateLog(QString data);
 private slots:
-    void on_connectButton_clicked();
-    void on_connectButton_2_clicked();
+    //UI
+    void connectClicked();
 
     void threadFinished();
-
-    void on_connectButton_3_clicked();
+    void sendHalt();
+    void sendReturn();
+    void sendRelease();
+    void sendSpeed();
 private:
     Ui::MainWindow *ui;
 

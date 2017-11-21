@@ -12,19 +12,21 @@ public:
     DataHandler(QObject *parent = nullptr);
     ~DataHandler();
     enum dataTypes{BatteryLevel,Action,Task};
-    enum messageTypes{Halt,Return};
+    enum messageTypes{Halt,Return,Release,SetSpeed};
     enum eventType{Connected,Connecting,Disconnected,SentData,ReceivedData};
 
     int batteryLevel(){return _batteryLevel;}
+    int speed(){return _speed;}
     QString task() {return _task;}
     QString action(){return _action;}
 
-    void createMessage(messageTypes messageType);
+    void createMessage(messageTypes messageType, QString additionalData = NULL);
     void logEvent(eventType event, QList<QString> eventData = QList<QString>());
 private:
-    int _batteryLevel;
-    QString _task;
-    QString _action;
+    int _batteryLevel = 0;
+    int _speed = 0;
+    QString _task = "";
+    QString _action = "";
 signals:
     void updateValues();
     void sendMessage(QByteArray data);

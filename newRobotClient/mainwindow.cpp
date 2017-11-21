@@ -5,6 +5,16 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow){
     ui->setupUi(this);
+
+    //Connect menu actions
+    connect(ui->actionConnect,SIGNAL(triggered(bool)),this,SLOT(connectClicked()));
+    connect(ui->actionExit,SIGNAL(triggered(bool)),this,SLOT(close()));
+
+    connect(ui->actionHalt,SIGNAL(triggered(bool)),this,SLOT(sendHalt()));
+    connect(ui->actionReturn,SIGNAL(triggered(bool)),this,SLOT(sendReturn()));
+    connect(ui->actionRelease,SIGNAL(triggered(bool)),this,SLOT(sendRelease()));
+    connect(ui->actionSetSpeed,SIGNAL(triggered(bool)),this,SLOT(sendSpeed()));
+
 }
 
 MainWindow::~MainWindow(){
@@ -28,7 +38,7 @@ void MainWindow::connectSignals(){
     connect(handler,SIGNAL(updateValues()),this,SLOT(updateUiValues())); //handler->this | Temporary for displaying values in UI
     connect(handler,SIGNAL(sendMessage(QByteArray)),connection,SLOT(sendData(QByteArray))); //handler->connection | Temporary for sending messages via socket
 
-    connect(handler,SIGNAL(sendLogData(QString)),this,SLOT(updateLog(QString)));
+    connect(handler,SIGNAL(sendLogData(QString)),this,SLOT(updateLog(QString))); //For data logging
 
 }
 ///Slots->
@@ -37,23 +47,22 @@ void MainWindow::changeConnectionStatus(Connection::connectionStatus status,QStr
     switch (status){
     case Connection::Connected:
         handler->logEvent(DataHandler::Connected,QList<QString>{ipAddress, "Testi"});
-        ui->connectButton_2->setEnabled(true);
-        ui->connectButton->setEnabled(true);
-        ui->connectButton->setText("Disconnect");
+        ui->menuConnect->setEnabled(true);
+        ui->menuCommand->setEnabled(true);
+        ui->actionConnect->setText("Disconnect");
         connected = true;
         break;
     case Connection::Disconnected:
         handler->logEvent(DataHandler::Disconnected,QList<QString>{ipAddress, "Testi", "Testi", "Testi"});
-        ui->connectButton->setEnabled(true);
-        ui->connectButton_2->setEnabled(false);
-        ui->connectButton->setText("Connect");
+        ui->menuConnect->setEnabled(true);
+        ui->menuCommand->setEnabled(false);
+        ui->actionConnect->setText("Connect");
         connected = false;
         break;
     case Connection::Connecting:
         handler->logEvent(DataHandler::Connecting,QList<QString>{ipAddress});
-        ui->connectButton->setEnabled(false);
-        ui->connectButton_2->setEnabled(false);
-        ui->connectButton->setText("Connecting");
+        ui->menuConnect->setEnabled(false);
+        ui->menuCommand->setEnabled(false);
         break;
     default:
         break;
@@ -80,13 +89,33 @@ void MainWindow::threadFinished(){
     delete handler;
 }
 
+void MainWindow::sendHalt(){handler->createMessage(DataHandler::Halt);}
+void MainWindow::sendReturn(){handler->createMessage(DataHandler::Return);}
+void MainWindow::sendRelease(){handler->createMessage(DataHandler::Release);}
+void MainWindow::sendSpeed(){
+    bool ok;
+    QString message = QStringLiteral("New speed: (Current: %1 )").arg(handler->speed());
+    int speed = QInputDialog::getInt(this,message,tr("Speed:"), QLineEdit::Normal,0,100,1,&ok);
+    if(ok){
+        handler->createMessage(DataHandler::SetSpeed,QString::number(speed));
+    }
 
-///Ui slots->
-void MainWindow::on_connectButton_clicked(){
+}
+
+
+void MainWindow::connectClicked()
+{
     if(!connected){
-
-        ipAddress = ui->connectionInfoLabel->text().split(":")[0];
-        port = ui->connectionInfoLabel->text().split(":")[1].toInt();
+        QString text = QInputDialog::getText(this, tr("Enter IP:PORT"),tr("Address:"), QLineEdit::Normal);
+        if(text.indexOf(':') == -1){
+            QMessageBox msgBox;
+            msgBox.setWindowTitle("Invalid address");
+            msgBox.setText("Invalid address");
+            msgBox.exec();
+            return;
+        }
+        ipAddress = text.split(":")[0];
+        port = text.split(":")[1].toInt();
 
         thread = new QThread();
         connection = new Connection(nullptr,ipAddress,port);
@@ -100,19 +129,5 @@ void MainWindow::on_connectButton_clicked(){
     }
     else{
         emit closeConnection();
-    }
-}
-
-void MainWindow::on_connectButton_2_clicked()
-{
-    switch (ui->commandBox->currentIndex()) {
-    case DataHandler::Halt:
-        handler->createMessage(DataHandler::Halt);
-        break;
-    case DataHandler::Return:
-        handler->createMessage(DataHandler::Return);
-        break;
-    default:
-        break;
     }
 }
