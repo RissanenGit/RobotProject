@@ -79,7 +79,7 @@ void MainWindow::changeConnectionStatus(Connection::connectionStatus status,QStr
         ui->menuConnect->setEnabled(true);
         ui->menuCommand->setEnabled(false);
         ui->actionConnect->setText("Connect");
-
+        connected = false;
         showMessageBox("Error","Connection Dropped");
         break;
     default:
@@ -160,5 +160,5 @@ void MainWindow::connectClicked()
     }
 }
 
-void MainWindow::showHelp(){showMessageBox("Help", "Connect to the Robot using the Connect button in the File menu.\n\nAfter connecting, send commands to the Robot using the commands found under the Commands menu");}
+void MainWindow::showHelp(){showMessageBox("Help", "Connect to the Robot using the Connect button in the File menu.\n\nAfter connecting, send commands to the Robot using the commands found under the Commands menu.");}
 void MainWindow::showAbout(){showMessageBox("About", "This program is used to remotely control a Robot\n\nVersion 1.0");}

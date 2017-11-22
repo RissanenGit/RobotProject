@@ -27,7 +27,7 @@ void DataHandler::logEvent(eventType event, QList<QString> eventData)
         break;
     }
     for(int i = 0; i < eventData.length(); i++){
-        message += "(" + eventData[i] + ")";
+        message += " | " + eventData[i];
     }
     emit sendLogData(QStringLiteral("[%1] %2").arg(QDateTime::currentDateTime().toString("HH:mm:ss")).arg(message));
 }
