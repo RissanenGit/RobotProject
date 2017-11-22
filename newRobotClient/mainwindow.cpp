@@ -93,7 +93,7 @@ void MainWindow::updateUiValues(){
     ui->taskLabel->setText(handler->task());
 
     //Check battery level
-    if(handler->batteryLevel() < lowBatteryLevel && errorList[LowBattery] != true){
+    if(handler->batteryLevel() < lowBatteryLevel && !errorList[LowBattery]){
         showMessageBox("Warning","Low Battery on Robot");
         errorList[LowBattery] = true;
     }
@@ -128,17 +128,18 @@ void MainWindow::sendSpeed(){
     }
 
 }
-
-
 void MainWindow::connectClicked()
 {
     if(!connected){
         bool ok;
-        QString text = QInputDialog::getText(this, tr("Enter IP:PORT"),tr("Address:"), QLineEdit::Normal,"192.168.1.63:9999",&ok);
+        QString text = QInputDialog::getText(this, tr("Enter address"),tr("Address:"), QLineEdit::Normal,"192.168.1.63:9999",&ok);
         if(!ok){return;}
 
-        if(text.indexOf(':') == -1){
-            showMessageBox("Error", "Incorrect address entered");
+        QRegExp rx("[0-9]+(?:\.[0-9]+){3}:[0-9]+"); //Checking the IP and PORT
+        QRegExpValidator validator (rx,0);
+        int pos = 0;
+        if(validator.validate(text,pos) != QValidator::Acceptable){
+            showMessageBox("Error","Invalid address entered");
             return;
         }
         ipAddress = text.split(":")[0];
@@ -159,6 +160,5 @@ void MainWindow::connectClicked()
     }
 }
 
-void MainWindow::showHelp(){showMessageBox("Usage", "Help text goes here");}
-
-void MainWindow::showAbout(){showMessageBox("About", "About text goes here");}
+void MainWindow::showHelp(){showMessageBox("Help", "Connect to the Robot using the Connect button in the File menu.\n\nAfter connecting, send commands to the Robot using the commands found under the Commands menu");}
+void MainWindow::showAbout(){showMessageBox("About", "This program is used to remotely control a Robot\n\nVersion 1.0");}

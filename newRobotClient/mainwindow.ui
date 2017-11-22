@@ -10,6 +10,18 @@
     <height>493</height>
    </rect>
   </property>
+  <property name="minimumSize">
+   <size>
+    <width>745</width>
+    <height>493</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>745</width>
+    <height>493</height>
+   </size>
+  </property>
   <property name="windowTitle">
    <string>RobotClient</string>
   </property>
@@ -113,7 +125,7 @@
    <widget class="QTextBrowser" name="logView">
     <property name="geometry">
      <rect>
-      <x>7</x>
+      <x>9</x>
       <y>200</y>
       <width>731</width>
       <height>241</height>
@@ -193,7 +205,7 @@
   </action>
   <action name="actionUsage">
    <property name="text">
-    <string>Usage</string>
+    <string>Help</string>
    </property>
   </action>
   <action name="actionAbout">

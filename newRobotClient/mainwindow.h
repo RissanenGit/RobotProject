@@ -7,6 +7,8 @@
 #include <QAction>
 #include <QMessageBox>
 #include <QMap>
+#include <QRegExp>
+
 
 #include <connection.h>
 #include <datahandler.h>
