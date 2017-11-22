@@ -3,24 +3,20 @@ import threading
 import time
 import Queue
 
-class RobotServer(threading.Thread):
+class DatabaseConnection(threading.Thread):
     def __init__(self, mainQueue):
-        super(RobotServer, self).__init__()
+        super(DatabaseConnection, self).__init__()
 
         self.serverSocket = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
         self.serverSocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.serverSocket.setdefaulttimeout(2)
-
-        self.dataConnection = (socket.AF_INET,socket.SOCK_STREAM)
-
         self.bufferSize = 1024
-        self.queue = Queue.Queue() #Queue of this thread
 
+        self.queue = Queue.Queue() #Queue of this thread
         self.mainQueue = mainQueue #Queue of main thread
 
         self.dataToSend = None #Data to send
 
-    def insertServerQueue(self, function, *args): #Function used to interact with server thread queue
+    def insertDBQueue(self, function, *args): #Function used to interact with server thread queue
         self.queue.put((function, args))
 
     def checkQueue(self): #Used for checking the queue
@@ -38,19 +34,22 @@ class RobotServer(threading.Thread):
 
     def run(self): #Main loop
         print("ServerThread started")
+        self.serverSocket.bind(("0.0.0.0",9998))
+        self.serverSocket.settimeout(1)
+        self.serverSocket.listen(True)
         while True:
             self.checkQueue()
-            self.serverSocket.bind(("0.0.0.0",9998))
             try:
-                self.serverSocket.listen(True)
                 connection,address = self.serverSocket.accept()
             except socket.timeout:
                 if self.dataToSend != None:
-                    self.dataConnection.connect("")
-                    self.dataConnection.send(self.dataToSend)
-                    self.dataConnection.close()
+                    dataConnection = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+                    dataConnection.connect(("127.0.0.1",9999))
+                    dataConnection.send(self.dataToSend)
+                    dataConnection.close()
+                    dataToSend = None
                 continue
-        while True: #Outer loop | Wait for client to connect
+
             print("Database connected from: ", address)
             connection.settimeout(0.5) #Set timeout for receiving data
             while True: #Inner loop | Handle sending and receiving data to/from client
