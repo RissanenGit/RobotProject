@@ -33,7 +33,7 @@ class DatabaseConnection(threading.Thread):
         self.mainQueue.put(data)
 
     def run(self): #Main loop
-        print("ServerThread started")
+        print("DBThread started")
         self.serverSocket.bind(("0.0.0.0",9998))
         self.serverSocket.settimeout(1)
         self.serverSocket.listen(True)
@@ -41,16 +41,16 @@ class DatabaseConnection(threading.Thread):
             self.checkQueue()
             try:
                 connection,address = self.serverSocket.accept()
-            except socket.timeout:
-                if self.dataToSend != None:
+            except socket.timeout: #No connection from DB
+                if self.dataToSend != None: #If we want to send data to DB
                     dataConnection = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-                    dataConnection.connect(("127.0.0.1",9999))
+                    dataConnection.connect(("127.0.0.1",9999)) #IP of webserver
                     dataConnection.send(self.dataToSend)
                     dataConnection.close()
-                    dataToSend = None
+                    self.dataToSend = None
                 continue
 
-            print("Database connected from: ", address)
+            print("DB connected from: ", address)
             connection.settimeout(0.5) #Set timeout for receiving data
             while True: #Inner loop | Handle sending and receiving data to/from client
                 try:
@@ -63,4 +63,4 @@ class DatabaseConnection(threading.Thread):
                 except socket.error: #Socket timeout in receiving data
                     pass
                 time.sleep(1)
-            print("Database disconnected: ", address) #Exited from inner loop, client disconnected
+            print("DB disconnected: ", address) #Exited from inner loop, client disconnected
