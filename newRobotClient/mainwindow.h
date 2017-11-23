@@ -27,11 +27,10 @@ public:
     ~MainWindow();
 private:
     void connectSignals();
-    void showMessageBox(QString title, QString message);
+    void createConnection();
 
     QString ipAddress;
     qint16 port;
-
 public slots:
     void changeConnectionStatus(Connection::connectionStatus status, QString statusText);
     void updateUiValues();

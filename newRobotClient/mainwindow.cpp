@@ -46,11 +46,17 @@ void MainWindow::connectSignals(){
 
 }
 
-void MainWindow::showMessageBox(QString title,QString message){
-    QMessageBox msgBox;
-    msgBox.setWindowTitle(title);
-    msgBox.setText(message);
-    msgBox.exec();
+void MainWindow::createConnection()
+{
+    thread = new QThread();
+    connection = new Connection(nullptr,ipAddress,port);
+    handler = new DataHandler();
+
+    connection->moveToThread(thread);
+    connectSignals();
+
+    qDebug("Starting thread");
+    thread->start();
 }
 ///Slots->
 void MainWindow::changeConnectionStatus(Connection::connectionStatus status,QString statusText){
@@ -81,7 +87,10 @@ void MainWindow::changeConnectionStatus(Connection::connectionStatus status,QStr
         ui->menuCommand->setEnabled(false);
         ui->actionConnect->setText("Connect");
         connected = false;
-        showMessageBox("Error","Connection Lost");
+
+        QMessageBox::StandardButton reply;
+        reply = QMessageBox::warning(this, "Error", "Connection Lost.\nReconnect?",QMessageBox::Yes|QMessageBox::No);
+        if (reply == QMessageBox::Yes){createConnection();}
         break;
     default:
         break;
@@ -132,26 +141,18 @@ void MainWindow::connectClicked()
         QRegExpValidator validator (rx,0);
         int pos = 0;
         if(validator.validate(text,pos) != QValidator::Acceptable){
-            showMessageBox("Error","Invalid address entered");
+            QMessageBox::warning(this, "Error", "Invalid address entered",QMessageBox::Yes);
             return;
         }
         ipAddress = text.split(":")[0];
         port = text.split(":")[1].toInt();
 
-        thread = new QThread();
-        connection = new Connection(nullptr,ipAddress,port);
-        handler = new DataHandler();
-
-        connection->moveToThread(thread);
-        connectSignals();
-
-        qDebug("Starting thread");
-        thread->start();
+        createConnection();
     }
     else{
         emit closeConnection();
     }
 }
-void MainWindow::batteryLevelWarning(){showMessageBox("Warning","Low battery on Robot");}
-void MainWindow::showHelp(){showMessageBox("Help", "Connect to the Robot using the Connect button in the File menu.\n\nAfter connecting, send commands to the Robot using the commands found under the Commands menu.");}
-void MainWindow::showAbout(){showMessageBox("About", "This program is used to remotely control a Robot\n\nVersion 1.0");}
+void MainWindow::batteryLevelWarning(){QMessageBox::warning(this, "Warning", "Low battery on Robot",QMessageBox::Yes);}
+void MainWindow::showHelp(){QMessageBox::information(this, "Help", "Connect to the Robot using the Connect button in the File menu.\n\nAfter connecting, send commands to the Robot using the commands found under the Commands menu.",QMessageBox::Yes);}
+void MainWindow::showAbout(){ QMessageBox::information(this, "About", "This program is used to remotely control a Robot\n\nVersion 1.0",QMessageBox::Yes);}
