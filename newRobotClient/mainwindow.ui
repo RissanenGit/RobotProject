@@ -44,7 +44,7 @@
      <string>Not Connected</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label">
+   <widget class="QLabel" name="batteryText">
     <property name="geometry">
      <rect>
       <x>550</x>
@@ -57,11 +57,11 @@
      <string>Battery</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label_2">
+   <widget class="QLabel" name="actionText">
     <property name="geometry">
      <rect>
       <x>550</x>
-      <y>30</y>
+      <y>60</y>
       <width>61</width>
       <height>21</height>
      </rect>
@@ -70,11 +70,11 @@
      <string>Action</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label_3">
+   <widget class="QLabel" name="taskText">
     <property name="geometry">
      <rect>
       <x>550</x>
-      <y>60</y>
+      <y>90</y>
       <width>61</width>
       <height>21</height>
      </rect>
@@ -100,7 +100,7 @@
     <property name="geometry">
      <rect>
       <x>610</x>
-      <y>30</y>
+      <y>60</y>
       <width>115</width>
       <height>21</height>
      </rect>
@@ -113,7 +113,7 @@
     <property name="geometry">
      <rect>
       <x>610</x>
-      <y>60</y>
+      <y>90</y>
       <width>115</width>
       <height>21</height>
      </rect>
@@ -125,11 +125,37 @@
    <widget class="QTextBrowser" name="logView">
     <property name="geometry">
      <rect>
-      <x>9</x>
+      <x>7</x>
       <y>200</y>
       <width>731</width>
       <height>241</height>
      </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="speedText">
+    <property name="geometry">
+     <rect>
+      <x>550</x>
+      <y>30</y>
+      <width>61</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Speed</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="speedLabel">
+    <property name="geometry">
+     <rect>
+      <x>610</x>
+      <y>30</y>
+      <width>115</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
     </property>
    </widget>
   </widget>

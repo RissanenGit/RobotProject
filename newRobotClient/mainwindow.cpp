@@ -76,12 +76,12 @@ void MainWindow::changeConnectionStatus(Connection::connectionStatus status,QStr
         connected = false;
         break;
     case Connection::ConnectionDropped:
-        handler->logEvent(DataHandler::Disconnected,QList<QString>{ipAddress,"Connection Dropped"});
+        handler->logEvent(DataHandler::Disconnected,QList<QString>{ipAddress,"Connection Lost"});
         ui->menuConnect->setEnabled(true);
         ui->menuCommand->setEnabled(false);
         ui->actionConnect->setText("Connect");
         connected = false;
-        showMessageBox("Error","Connection Dropped");
+        showMessageBox("Error","Connection Lost");
         break;
     default:
         break;
@@ -90,6 +90,7 @@ void MainWindow::changeConnectionStatus(Connection::connectionStatus status,QStr
 
 void MainWindow::updateUiValues(){
     ui->batteryLabel->setText(QString::number((handler->batteryLevel())));
+    ui->speedLabel->setText(QString::number(handler->speed()));
     ui->actionLabel->setText(handler->action());
     ui->taskLabel->setText(handler->task());
 }

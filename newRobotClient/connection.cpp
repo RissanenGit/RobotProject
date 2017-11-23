@@ -81,13 +81,13 @@ void Connection::disconnectedFromServer(){ //Connection dropped
     disconnectSignals();
 
     if(!retry){
-        emit connectionStatusChanged(connectionStatus::ConnectionDropped,"Connection dropped");
+        emit connectionStatusChanged(connectionStatus::ConnectionDropped,"Connection Lost");
         qDebug() << "Connection emitting finished";
         emit finished();//Exit from thread
     }
     if(retry && !retryConnection()){//Try reconnecting
         qDebug("Cannot re-establish connection");
-        emit connectionStatusChanged(connectionStatus::Disconnected,"Connection dropped");
+        emit connectionStatusChanged(connectionStatus::ConnectionDropped,"Connection Lost");
         qDebug() << "Connection emitting finished";
         emit finished();//Exit from thread
     }
