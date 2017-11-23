@@ -32,6 +32,18 @@ void DataHandler::logEvent(eventType event, QList<QString> eventData)
     emit sendLogData(QStringLiteral("[%1] %2").arg(QDateTime::currentDateTime().toString("HH:mm:ss")).arg(message));
 }
 
+void DataHandler::checkBatteryLevel()
+{
+    if(_batteryLevel < lowBatteryLevel && errorList[LowBattery] == false){
+        qDebug() << "LowBattery";
+        errorList[LowBattery] = true;
+        emit lowBatteryWarning();
+    }
+    else if(_batteryLevel > lowBatteryLevel + 20){
+        errorList[LowBattery] = false;
+    }
+}
+
 void DataHandler::createMessage(messageTypes messageType, QString additionalData)
 {
     QByteArray message = "";
@@ -75,5 +87,7 @@ void DataHandler::parseData(QByteArray data){
     }
     logEvent(ReceivedData);
     emit updateValues();
+
+    checkBatteryLevel();
 
 }

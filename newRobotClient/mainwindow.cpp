@@ -42,6 +42,7 @@ void MainWindow::connectSignals(){
     connect(handler,SIGNAL(sendMessage(QByteArray)),connection,SLOT(sendData(QByteArray))); //handler->connection | Temporary for sending messages via socket
 
     connect(handler,SIGNAL(sendLogData(QString)),this,SLOT(updateLog(QString))); //For data logging
+    connect(handler,SIGNAL(lowBatteryWarning()),this,SLOT(batteryLevelWarning()));
 
 }
 
@@ -91,15 +92,6 @@ void MainWindow::updateUiValues(){
     ui->batteryLabel->setText(QString::number((handler->batteryLevel())));
     ui->actionLabel->setText(handler->action());
     ui->taskLabel->setText(handler->task());
-
-    //Check battery level
-    if(handler->batteryLevel() < lowBatteryLevel && !errorList[LowBattery]){
-        showMessageBox("Warning","Low Battery on Robot");
-        errorList[LowBattery] = true;
-    }
-    else if(handler->batteryLevel() > lowBatteryLevel + 20){
-        errorList[LowBattery] = false;
-    }
 }
 void MainWindow::updateLog(QString data)
 {
@@ -159,6 +151,6 @@ void MainWindow::connectClicked()
         emit closeConnection();
     }
 }
-
+void MainWindow::batteryLevelWarning(){showMessageBox("Warning","Low battery on Robot");}
 void MainWindow::showHelp(){showMessageBox("Help", "Connect to the Robot using the Connect button in the File menu.\n\nAfter connecting, send commands to the Robot using the commands found under the Commands menu.");}
 void MainWindow::showAbout(){showMessageBox("About", "This program is used to remotely control a Robot\n\nVersion 1.0");}

@@ -31,10 +31,7 @@ private:
 
     QString ipAddress;
     qint16 port;
-    enum errorTypes{LowBattery};
-    QMap<errorTypes,bool> errorList {{LowBattery,false}};
 
-    const int lowBatteryLevel = 30;
 public slots:
     void changeConnectionStatus(Connection::connectionStatus status, QString statusText);
     void updateUiValues();
@@ -50,6 +47,7 @@ private slots:
     void sendReturn();
     void sendRelease();
     void sendSpeed();
+    void batteryLevelWarning();
 
 
 private:
