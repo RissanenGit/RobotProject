@@ -3,17 +3,15 @@ def parseData(data):
     try:
         for command in data.split(','):
             parsedData[command.split(':')[0]] = command.split(':')[1]
-            try:
-                value = commad.split(':')[3]
-                return parseData,value
-            except IndexError:
-                return parsedData
-        return parseData
+        return parsedData
     except Exception:
         return False
 
-def createDataPacket(data):
+def createServerPacket(data):
     packet = ""
     for key in data:
         packet = packet + key + ":" + str(data[key]) + "\n"
     return packet
+
+def createDatabasePacket(data):
+    return None

@@ -30,7 +30,7 @@ class RobotServer(threading.Thread):
         self.dataToSend = data
 
     def setData(self,data): #Sending data to main thread
-        self.mainQueue.put(data)
+        self.mainQueue.put((data,self))
 
     def run(self): #Main loop
         print("ServerThread started")

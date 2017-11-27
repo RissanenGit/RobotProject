@@ -3,6 +3,9 @@ import threading
 import time
 import Queue
 
+DBAddress = "127.0.0.1"
+DBPort = 9999
+
 class DatabaseConnection(threading.Thread):
     def __init__(self, mainQueue):
         super(DatabaseConnection, self).__init__()
@@ -30,7 +33,7 @@ class DatabaseConnection(threading.Thread):
         self.dataToSend = data
 
     def setData(self,data): #Sending data to main thread
-        self.mainQueue.put(data)
+        self.mainQueue.put((data,self))
 
     def run(self): #Main loop
         print("DBThread started")
@@ -44,7 +47,7 @@ class DatabaseConnection(threading.Thread):
             except socket.timeout: #No connection from DB
                 if self.dataToSend != None: #If we want to send data to DB
                     dataConnection = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-                    dataConnection.connect(("127.0.0.1",9999)) #IP of webserver
+                    dataConnection.connect((DBAddress,DBPort)) #IP of webserver
                     dataConnection.send(self.dataToSend)
                     dataConnection.close()
                     self.dataToSend = None

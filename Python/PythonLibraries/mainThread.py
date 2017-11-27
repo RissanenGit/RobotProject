@@ -1,24 +1,51 @@
 import threading
-import RobotServer
 import time
 import Queue
+
+import RobotServer
+import DatabaseConnection
+import RobotMovement
+
 import DataParser
 
 mainQueue = Queue.Queue()
 
 serverThread = RobotServer.RobotServer(mainQueue)
+movementThread = RobotMovement.RobotMovement(mainQueue)
+dbThread = DatabaseConnection.DatabaseConnection(mainQueue)
+
 serverThread.setDaemon(True)
 serverThread.start()
 
-data = {"BatteryLevel" : 100, "Action" : "MovingLeft", "Task": "DeliveringItems"}
+movementThread.setDaemon(True)
+movementThread.start()
+
+dbThread.start()
+dbThread.setDaemon(True)
+
+#data = {"BatteryLevel" : 100, "Speed": 100, "Action" : "MovingLeft", "Task": "DeliveringItems"}
+def checkCommand(receivedData):
+    print(receivedData)
+    if(receivedData["Command"] == "Halt"):
+        movementThread.insertMovementQueue(movementThread.setPanic)
+    elif(receivedData["Command"] == "Release"):
+        #movementThread.insertMovementQueue(movementThread.removePanic)
+    elif(receivedData["Command"] == "Return"):
+        #movementThread.insertMovementQueue(movementThread.setReturn)
+    elif(receivedData["Command"] == "SetSpeed"):
+        #movementThread.insertMovementQueue(movementThread.setSpeed,int(receivedData["Value"]))
 
 def checkQueue():
     try:
-        print(mainQueue.get(timeout=0.5))
+        data,source = mainQueue.get(timeout=0.1)
+        if(type(source) == RobotServer.RobotServer or type(source) == DatabaseConnection.DatabaseConnection):
+            checkCommand(DataParser.parseData(data))
+        else:
+            #serverThread.insertServerQueue(serverThread.setData,DataParser.createDataPacket(data))
+            #dbThread.insertDBQueue(dbThread.setData,DataParser.createDatabasePacket(data))
     except Queue.Empty:
         return
 
 while True:
     checkQueue()
-    serverThread.insertServerQueue(serverThread.sendData,DataParser.createDataPacket(data))
-    data["BatteryLevel"] = data["BatteryLevel"] - 2
+    pass

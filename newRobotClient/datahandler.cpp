@@ -58,7 +58,7 @@ void DataHandler::createMessage(messageTypes messageType, QString additionalData
         message = "Command:Release";
         break;
     case SetSpeed:
-        message = "Command:SetSpeed:";
+        message = "Command:SetSpeed,Value:";
         message += additionalData;
     default:
         break;
@@ -82,6 +82,9 @@ void DataHandler::parseData(QByteArray data){
             }
             else if (event == "Task"){
                 _task = content[i].split(':')[1];
+            }
+            else if(event == "Speed"){
+                _speed = content[i].split(':')[1];
             }
         }
     }
