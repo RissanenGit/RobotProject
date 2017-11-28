@@ -25,7 +25,9 @@ class RobotServer(threading.Thread):
             function(*args)
         except Queue.Empty:
             return False
-
+    def clearQueue(self):
+        with self.queue.mutex:
+            self.queue.clear()
     def sendData(self,data): #Called from main thread to send data
         self.dataToSend = data
 
@@ -38,6 +40,7 @@ class RobotServer(threading.Thread):
         self.serverSocket.listen(True)
         while True: #Outer loop | Wait for client to connect
             connection,address = self.serverSocket.accept()
+            self.clearQueue() #Clear queue backlog
             connection.settimeout(0.5) #Set timeout for receiving data
             print("Connection from: ", address)
 

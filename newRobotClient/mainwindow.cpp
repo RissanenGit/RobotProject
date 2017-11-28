@@ -17,11 +17,13 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(ui->actionAbout,SIGNAL(triggered(bool)),this,SLOT(showAbout()));
     connect(ui->actionUsage,SIGNAL(triggered(bool)),this,SLOT(showHelp()));
+    connect(ui->actionSave_Log,SIGNAL(triggered(bool)),this,SLOT(saveLog()));
 
 }
 
 MainWindow::~MainWindow(){
     delete ui;
+    delete logDataToSave;
 }
 
 ///Functions->
@@ -58,31 +60,32 @@ void MainWindow::createConnection()
     qDebug("Starting thread");
     thread->start();
 }
+
 ///Slots->
 void MainWindow::changeConnectionStatus(Connection::connectionStatus status,QString statusText){
     ui->statusLabel->setText(statusText);
     switch (status){
     case Connection::Connecting:
-        handler->logEvent(DataHandler::Connecting,QList<QString>{ipAddress});
+        handler->logEvent(DataHandler::Connecting,QList<QString>{ipAddress + ":" + QString::number(port)});
         ui->menuConnect->setEnabled(false);
         ui->menuCommand->setEnabled(false);
         break;
     case Connection::Connected:
-        handler->logEvent(DataHandler::Connected,QList<QString>{ipAddress, "Testi"});
+        handler->logEvent(DataHandler::Connected,QList<QString>{ipAddress + ":" + QString::number(port)});
         ui->menuConnect->setEnabled(true);
         ui->menuCommand->setEnabled(true);
         ui->actionConnect->setText("Disconnect");
         connected = true;
         break;
     case Connection::Disconnected:
-        handler->logEvent(DataHandler::Disconnected,QList<QString>{ipAddress, "Testi", "Testi", "Testi"});
+        handler->logEvent(DataHandler::Disconnected,QList<QString>{ipAddress + ":" + QString::number(port)});
         ui->menuConnect->setEnabled(true);
         ui->menuCommand->setEnabled(false);
         ui->actionConnect->setText("Connect");
         connected = false;
         break;
     case Connection::ConnectionDropped:
-        handler->logEvent(DataHandler::Disconnected,QList<QString>{ipAddress,"Connection Lost"});
+        handler->logEvent(DataHandler::Disconnected,QList<QString>{ipAddress + ":" + QString::number(port),"Connection Lost"});
         ui->menuConnect->setEnabled(true);
         ui->menuCommand->setEnabled(false);
         ui->actionConnect->setText("Connect");
@@ -101,11 +104,11 @@ void MainWindow::updateUiValues(){
     ui->batteryLabel->setText(QString::number((handler->batteryLevel())));
     ui->speedLabel->setText(QString::number(handler->speed()));
     ui->actionLabel->setText(handler->action());
-    ui->taskLabel->setText(handler->task());
 }
 void MainWindow::updateLog(QString data)
 {
     ui->logView->append(data);
+    logDataToSave->append(data + "\n");
 }
 void MainWindow::threadFinished(){
     while(!thread->isFinished()){}
@@ -116,7 +119,41 @@ void MainWindow::threadFinished(){
     delete connection;
     delete handler;
 }
+void MainWindow::saveLog(){
+    if(logDataToSave->isEmpty()){
+        QMessageBox::warning(this, "Warning", "No new log data",QMessageBox::Yes);
+        return;
+    }
+    QFile file("log.txt");
+    bool hasDate = false;
+    //If file doesnt exist, create it
+    if(file.exists()){
+        if (!file.open(QIODevice::ReadOnly | QIODevice::Text)){
+            QMessageBox::warning(this, "Warning", file.errorString(),QMessageBox::Yes);
+            return;
+        }
+        QTextStream in(&file);
+        while(!in.atEnd()){
+            if(in.readLine().contains(QDate::currentDate().toString("d:M:yyyy"))){
+                hasDate = true;
+            }
+        }
+        file.close();
+    }
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Append)){
+        QMessageBox::warning(this, "Warning", file.errorString(),QMessageBox::Yes);
+        return;
+    }
+    QTextStream out(&file);
 
+    if(!hasDate){
+        out << QDate::currentDate().toString("d:M:yyyy") << "\n----------------------------------------\n";
+    }
+    out << *logDataToSave << "\n";
+    file.close();
+    *logDataToSave = "";
+    QMessageBox::information(this, "Success", "Log saved",QMessageBox::Yes);
+}
 void MainWindow::sendHalt(){handler->createMessage(DataHandler::Halt);}
 void MainWindow::sendReturn(){handler->createMessage(DataHandler::Return);}
 void MainWindow::sendRelease(){handler->createMessage(DataHandler::Release);}
@@ -154,5 +191,6 @@ void MainWindow::connectClicked()
     }
 }
 void MainWindow::batteryLevelWarning(){QMessageBox::warning(this, "Warning", "Low battery on Robot",QMessageBox::Yes);}
+
 void MainWindow::showHelp(){QMessageBox::information(this, "Help", "Connect to the Robot using the Connect button in the File menu.\n\nAfter connecting, send commands to the Robot using the commands found under the Commands menu.",QMessageBox::Yes);}
 void MainWindow::showAbout(){ QMessageBox::information(this, "About", "This program is used to remotely control a Robot\n\nVersion 1.0",QMessageBox::Yes);}

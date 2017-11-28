@@ -8,7 +8,7 @@
 #include <QMessageBox>
 #include <QMap>
 #include <QRegExp>
-
+#include <QFile>
 
 #include <connection.h>
 #include <datahandler.h>
@@ -30,6 +30,7 @@ private:
     void createConnection();
 
     QString ipAddress;
+    QString *logDataToSave = new QString("");
     qint16 port;
 public slots:
     void changeConnectionStatus(Connection::connectionStatus status, QString statusText);
@@ -47,6 +48,8 @@ private slots:
     void sendRelease();
     void sendSpeed();
     void batteryLevelWarning();
+
+    void saveLog();
 
 
 private:

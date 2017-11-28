@@ -14,10 +14,10 @@ public:
     enum dataTypes{BatteryLevel,Action,Task};
     enum messageTypes{Halt,Return,Release,SetSpeed};
     enum eventType{Connected,Connecting,Disconnected,SentData,ReceivedData};
+    enum robotEvents{Forward};
 
     int batteryLevel(){return _batteryLevel;}
     int speed(){return _speed;}
-    QString task() {return _task;}
     QString action(){return _action;}
 
     void createMessage(messageTypes messageType, QString additionalData = NULL);
@@ -27,9 +27,9 @@ private:
 
     int _batteryLevel = 0;
     int _speed = 0;
-    QString _task = "";
     QString _action = "";
     void checkBatteryLevel();
+    QString getRobotEvent(int event);
 
     enum errorTypes{LowBattery};
     QMap<errorTypes,bool> errorList {{LowBattery,false}};

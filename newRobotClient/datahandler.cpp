@@ -44,6 +44,15 @@ void DataHandler::checkBatteryLevel()
     }
 }
 
+QString DataHandler::getRobotEvent(int event){
+    switch (event) {
+    case Forward:
+        break;
+    default:
+        break;
+    }
+}
+
 void DataHandler::createMessage(messageTypes messageType, QString additionalData)
 {
     QByteArray message = "";
@@ -70,25 +79,26 @@ void DataHandler::createMessage(messageTypes messageType, QString additionalData
 void DataHandler::parseData(QByteArray data){
 
     QList<QByteArray>content = data.split('\n');
-
+    QList<QString>receivedData;
     for(int i = 0; i < content.length() - 1; i++){
         if(content[i].split(':').length() > 0){
-            QString event = content[i].split(':')[0];
-            if(event == "BatteryLevel"){
+            QString contentData = content[i].split(':')[0];
+            if(contentData == "BatteryLevel"){
                 _batteryLevel = content[i].split(':')[1].toInt();
             }
-            else if(event == "Action"){
-                _action = content[i].split(':')[1];
+            else if(contentData == "EventType"){
+                //_action = getRobotEvent(content[i].split(':')[1].toInt());
             }
-            else if (event == "Task"){
-                _task = content[i].split(':')[1];
+            else if(contentData == "Speed"){
+                _speed = content[i].split(':')[1].toInt();
             }
-            else if(event == "Speed"){
-                _speed = content[i].split(':')[1];
+            else{
+                qDebug() << "UnknownData" << content;
             }
+            receivedData.append(contentData + content[i].split(':')[1]);
         }
     }
-    logEvent(ReceivedData);
+    logEvent(ReceivedData,receivedData);
     emit updateValues();
 
     checkBatteryLevel();

@@ -29,10 +29,13 @@ def checkCommand(receivedData):
     if(receivedData["Command"] == "Halt"):
         movementThread.insertMovementQueue(movementThread.setPanic)
     elif(receivedData["Command"] == "Release"):
+        pass
         #movementThread.insertMovementQueue(movementThread.removePanic)
     elif(receivedData["Command"] == "Return"):
+        pass
         #movementThread.insertMovementQueue(movementThread.setReturn)
     elif(receivedData["Command"] == "SetSpeed"):
+        pass
         #movementThread.insertMovementQueue(movementThread.setSpeed,int(receivedData["Value"]))
 
 def checkQueue():
@@ -40,9 +43,9 @@ def checkQueue():
         data,source = mainQueue.get(timeout=0.1)
         if(type(source) == RobotServer.RobotServer or type(source) == DatabaseConnection.DatabaseConnection):
             checkCommand(DataParser.parseData(data))
-        else:
-            #serverThread.insertServerQueue(serverThread.setData,DataParser.createDataPacket(data))
-            #dbThread.insertDBQueue(dbThread.setData,DataParser.createDatabasePacket(data))
+        elif(type(source) == RobotMovement.RobotMovement):
+            serverThread.insertServerQueue(serverThread.sendData,DataParser.createDataPacket(data))
+            dbThread.insertDBQueue(dbThread.sendData,DataParser.createDatabasePacket(data))
     except Queue.Empty:
         return
 
