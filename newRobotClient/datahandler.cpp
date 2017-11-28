@@ -83,19 +83,20 @@ void DataHandler::parseData(QByteArray data){
     for(int i = 0; i < content.length() - 1; i++){
         if(content[i].split(':').length() > 0){
             QString contentData = content[i].split(':')[0];
+            QString contentValue = content[i].split(':')[1];
             if(contentData == "BatteryLevel"){
-                _batteryLevel = content[i].split(':')[1].toInt();
+                _batteryLevel = contentValue.toInt();
             }
             else if(contentData == "EventType"){
-                //_action = getRobotEvent(content[i].split(':')[1].toInt());
+                //_action = getRobotEvent(contentValue.toInt());
             }
             else if(contentData == "Speed"){
-                _speed = content[i].split(':')[1].toInt();
+                _speed = contentValue.toInt();
             }
             else{
-                qDebug() << "UnknownData" << content;
+                qDebug() << "UnknownData" << contentData;
             }
-            receivedData.append(contentData + content[i].split(':')[1]);
+            receivedData.append(contentData + ":" + content[i].split(':')[1]);
         }
     }
     logEvent(ReceivedData,receivedData);

@@ -126,7 +126,6 @@ void MainWindow::saveLog(){
     }
     QFile file("log.txt");
     bool hasDate = false;
-    //If file doesnt exist, create it
     if(file.exists()){
         if (!file.open(QIODevice::ReadOnly | QIODevice::Text)){
             QMessageBox::warning(this, "Warning", file.errorString(),QMessageBox::Yes);
@@ -134,8 +133,9 @@ void MainWindow::saveLog(){
         }
         QTextStream in(&file);
         while(!in.atEnd()){
-            if(in.readLine().contains(QDate::currentDate().toString("d:M:yyyy"))){
+            if(in.readLine().contains(QDate::currentDate().toString("d.M.yyyy"))){
                 hasDate = true;
+                break;
             }
         }
         file.close();
@@ -147,7 +147,7 @@ void MainWindow::saveLog(){
     QTextStream out(&file);
 
     if(!hasDate){
-        out << QDate::currentDate().toString("d:M:yyyy") << "\n----------------------------------------\n";
+        out << QDate::currentDate().toString("d.M.yyyy") << "\n----------------------------------------\n";
     }
     out << *logDataToSave << "\n";
     file.close();
@@ -192,5 +192,5 @@ void MainWindow::connectClicked()
 }
 void MainWindow::batteryLevelWarning(){QMessageBox::warning(this, "Warning", "Low battery on Robot",QMessageBox::Yes);}
 
-void MainWindow::showHelp(){QMessageBox::information(this, "Help", "Connect to the Robot using the Connect button in the File menu.\n\nAfter connecting, send commands to the Robot using the commands found under the Commands menu.",QMessageBox::Yes);}
+void MainWindow::showHelp(){QMessageBox::information(this, "Help", "Connect to the Robot using the Connect button in the File menu.\n\nAfter connecting, send commands to the Robot using the commands found under the Commands menu.\n\nThe logs can be saved to a file using the Save Log button in the File menu.",QMessageBox::Yes);}
 void MainWindow::showAbout(){ QMessageBox::information(this, "About", "This program is used to remotely control a Robot\n\nVersion 1.0",QMessageBox::Yes);}

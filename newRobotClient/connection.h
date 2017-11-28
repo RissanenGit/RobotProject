@@ -36,10 +36,6 @@ public slots:
     void sendData(QByteArray data);
     void disconnectedFromServer();
     void closeConnection();
-
-    void statusChanged(QAbstractSocket::SocketState state);
-    void socketError(QAbstractSocket::SocketError error);
-
 };
 
 #endif // CONNECTION_H

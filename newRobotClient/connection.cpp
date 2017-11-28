@@ -16,9 +16,6 @@ Connection::~Connection(){ //Socket is deleted when connection is deleted in the
 void Connection::connectSignals(){ //Handles connecting all the necessary signals
     connect(socket,SIGNAL(readyRead()),this,SLOT(readData()));
     connect(socket,SIGNAL(disconnected()),this,SLOT(disconnectedFromServer()));
-    connect(socket,SIGNAL(stateChanged(QAbstractSocket::SocketState)),this,SLOT(statusChanged(QAbstractSocket::SocketState)));
-    connect(socket,SIGNAL(error(QAbstractSocket::SocketError)),this,SLOT(socketError(QAbstractSocket::SocketError)));
-
     qDebug() << "Connected signals";
 }
 void Connection::disconnectSignals(){
@@ -108,14 +105,3 @@ void Connection::closeConnection(){//User wants to disconnect through UI
     emit connectionStatusChanged(connectionStatus::Disconnected,"Disconnected");
     emit finished();//Exit from thread
 }
-
-void Connection::statusChanged(QAbstractSocket::SocketState state)
-{
-    qDebug() << "Connection state: " << state;
-}
-
-void Connection::socketError(QAbstractSocket::SocketError error)
-{
-    qDebug() << "Socket error: " << error;
-}
-
