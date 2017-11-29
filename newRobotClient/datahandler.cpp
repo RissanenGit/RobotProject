@@ -46,17 +46,27 @@ void DataHandler::checkBatteryLevel()
 
 QString DataHandler::getRobotEvent(int event){
     switch (event) {
-    case Forward:
+    case QRNodeFound:
+        break;
+    case PathBlocked:
+        break;
+    case SearchingWall:
         break;
     default:
         break;
     }
 }
 
-void DataHandler::createMessage(messageTypes messageType, QString additionalData)
+void DataHandler::createMessage(messageTypes messageType, QList<QString> additionalData)
 {
     QByteArray message = "";
     switch (messageType) {
+    case RegisterRobot:
+        message = "Command:RegisterRobot,RobotId:";
+        message += additionalData[0];
+        message += ",RobotPassword:";
+        message += additionalData[1];
+        break;
     case Halt:
         message = "Command:Halt";
         break;
@@ -68,7 +78,7 @@ void DataHandler::createMessage(messageTypes messageType, QString additionalData
         break;
     case SetSpeed:
         message = "Command:SetSpeed,Value:";
-        message += additionalData;
+        message += additionalData[0];
     default:
         break;
     }
@@ -85,13 +95,19 @@ void DataHandler::parseData(QByteArray data){
             QString contentData = content[i].split(':')[0];
             QString contentValue = content[i].split(':')[1];
             if(contentData == "BatteryLevel"){
-                _batteryLevel = contentValue.toInt();
+                _batteryLevel = contentValue.toFloat() / 1000;
             }
             else if(contentData == "EventType"){
                 //_action = getRobotEvent(contentValue.toInt());
             }
+            else if(contentData == "EventData"){
+                _action = contentValue;
+            }
             else if(contentData == "Speed"){
                 _speed = contentValue.toInt();
+            }
+            else if(contentData == "robotID"){
+                _robotId = contentValue;
             }
             else{
                 qDebug() << "UnknownData" << contentData;

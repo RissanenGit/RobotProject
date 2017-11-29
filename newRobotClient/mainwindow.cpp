@@ -14,9 +14,11 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionReturn,SIGNAL(triggered(bool)),this,SLOT(sendReturn()));
     connect(ui->actionRelease,SIGNAL(triggered(bool)),this,SLOT(sendRelease()));
     connect(ui->actionSetSpeed,SIGNAL(triggered(bool)),this,SLOT(sendSpeed()));
+    connect(ui->actionRegisterRobot,SIGNAL(triggered(bool)),this,SLOT(sendRobotRegister()));
 
     connect(ui->actionAbout,SIGNAL(triggered(bool)),this,SLOT(showAbout()));
     connect(ui->actionUsage,SIGNAL(triggered(bool)),this,SLOT(showHelp()));
+
     connect(ui->actionSave_Log,SIGNAL(triggered(bool)),this,SLOT(saveLog()));
     connect(ui->actionMovement_Controls,SIGNAL(triggered(bool)),this,SLOT(movementControl()));
 
@@ -47,11 +49,9 @@ void MainWindow::connectSignals(){
 
     connect(handler,SIGNAL(sendLogData(QString)),this,SLOT(updateLog(QString))); //For data logging
     connect(handler,SIGNAL(lowBatteryWarning()),this,SLOT(batteryLevelWarning()));
-
 }
 
-void MainWindow::createConnection()
-{
+void MainWindow::createConnection(){
     thread = new QThread();
     connection = new Connection(nullptr,ipAddress,port);
     handler = new DataHandler();
@@ -93,7 +93,7 @@ void MainWindow::changeConnectionStatus(Connection::connectionStatus status,QStr
         ui->actionConnect->setText("Connect");
         connected = false;
 
-        if(movementControlWindow != nullptr){
+        if(movementWindowOpen){
             movementControlWindow->close();
         }
 
@@ -110,9 +110,9 @@ void MainWindow::updateUiValues(){
     ui->batteryLabel->setText(QString::number((handler->batteryLevel())));
     ui->speedLabel->setText(QString::number(handler->speed()));
     ui->actionLabel->setText(handler->action());
+    ui->robotIdLabel->setText(handler->robotId());
 }
-void MainWindow::updateLog(QString data)
-{
+void MainWindow::updateLog(QString data){
     ui->logView->append(data);
     logDataToSave->append(data + "\n");
 }
@@ -126,10 +126,9 @@ void MainWindow::threadFinished(){
     delete handler;
 }
 
-void MainWindow::deleteMovementWindow()
-{
-    movementControlWindow = nullptr;
-    this->setEnabled(true);
+void MainWindow::movementWindowAction(){
+    this->setEnabled(!this->isEnabled());
+    movementWindowOpen = !movementWindowOpen;
 }
 
 void MainWindow::saveLog(){
@@ -176,12 +175,20 @@ void MainWindow::sendSpeed(){
     int speed = QInputDialog::getInt(this,message,tr("Speed:"), QLineEdit::Normal,0,100,1,&ok);
 
     if(ok){
-        handler->createMessage(DataHandler::SetSpeed,QString::number(speed));
+        handler->createMessage(DataHandler::SetSpeed,QList<QString>{QString::number(speed)});
     }
-
 }
-void MainWindow::connectClicked()
-{
+
+void MainWindow::sendRobotRegister(){
+    bool ok;
+    int robotID = QInputDialog::getInt(this,"Enter robot ID",tr("RobotID:"), QLineEdit::Normal,0,100,1,&ok);
+    if(!ok){return;}
+    QString robotPassword = QInputDialog::getText(this,"Enter robot password",tr("RobotPassword:"), QLineEdit::Normal,"",&ok);
+    if(!ok){return;}
+
+    handler->createMessage(DataHandler::RegisterRobot,QList<QString>{QString::number(robotID),robotPassword});
+}
+void MainWindow::connectClicked(){
     if(!connected){
         bool ok;
         QString text = QInputDialog::getText(this, tr("Enter address"),tr("Address:"), QLineEdit::Normal,"192.168.1.63:9999",&ok);
@@ -208,12 +215,11 @@ void MainWindow::batteryLevelWarning(){QMessageBox::warning(this, "Warning", "Lo
 void MainWindow::showHelp(){QMessageBox::information(this, "Help", "Connect to the Robot using the Connect button in the File menu.\n\nAfter connecting, send commands to the Robot using the commands found under the Commands menu.\n\nThe logs can be saved to a file using the Save Log button in the File menu.",QMessageBox::Yes);}
 void MainWindow::showAbout(){ QMessageBox::information(this, "About", "This program is used to remotely control a Robot\n\nVersion 1.0",QMessageBox::Yes);}
 
-void MainWindow::movementControl()
-{
+void MainWindow::movementControl(){
     movementControlWindow = new ControlForm(nullptr,handler);
     movementControlWindow->setAttribute(Qt::WA_DeleteOnClose);
-    connect(movementControlWindow,SIGNAL(destroyed(QObject*)),this,SLOT(deleteMovementWindow()));
+    connect(movementControlWindow,SIGNAL(destroyed(QObject*)),this,SLOT(movementWindowAction()));
     movementControlWindow->show();
 
-    this->setEnabled(false);
+    movementWindowAction();
 }

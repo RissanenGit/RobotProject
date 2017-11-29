@@ -12,21 +12,23 @@ public:
     DataHandler(QObject *parent = nullptr);
     ~DataHandler();
     enum dataTypes{BatteryLevel,Action,Task};
-    enum messageTypes{Halt,Return,Release,SetSpeed};
+    enum messageTypes{Halt,Return,Release,SetSpeed,RegisterRobot};
     enum eventType{Connected,Connecting,Disconnected,SentData,ReceivedData};
-    enum robotEvents{Forward};
+    enum robotEvents{QRNodeFound,PathBlocked,SearchingWall};
 
-    int batteryLevel(){return _batteryLevel;}
+    float batteryLevel(){return _batteryLevel;}
     int speed(){return _speed;}
     QString action(){return _action;}
+    QString robotId(){return _robotId;}
 
-    void createMessage(messageTypes messageType, QString additionalData = NULL);
+    void createMessage(messageTypes messageType, QList<QString> additionalData = QList<QString>());
     void logEvent(eventType event, QList<QString> eventData = QList<QString>());
 private:
-    const int lowBatteryLevel = 30;
+    const float lowBatteryLevel = 10;
 
-    int _batteryLevel = 0;
+    float _batteryLevel = 0;
     int _speed = 0;
+    QString _robotId = "None";
     QString _action = "";
     void checkBatteryLevel();
     QString getRobotEvent(int event);

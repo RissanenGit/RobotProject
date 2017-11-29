@@ -44,11 +44,12 @@ private slots:
     void showAbout();
 
     void threadFinished();
-    void deleteMovementWindow();
+    void movementWindowAction();
     void sendHalt();
     void sendReturn();
     void sendRelease();
     void sendSpeed();
+    void sendRobotRegister();
     void batteryLevelWarning();
 
     void saveLog();
@@ -65,7 +66,7 @@ private:
     DataHandler *handler;
 
     bool connected = false;
-
+    bool movementWindowOpen = false;
     bool movementControlEnable = true;
 signals:
     void closeConnection();
