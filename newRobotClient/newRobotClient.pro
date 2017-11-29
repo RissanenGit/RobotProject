@@ -27,12 +27,15 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
     connection.cpp \
-    datahandler.cpp
+    datahandler.cpp \
+    controlform.cpp
 
 HEADERS += \
         mainwindow.h \
     connection.h \
-    datahandler.h
+    datahandler.h \
+    controlform.h
 
 FORMS += \
-        mainwindow.ui
+        mainwindow.ui \
+    controlform.ui

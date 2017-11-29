@@ -148,6 +148,7 @@
     </property>
     <addaction name="actionConnect"/>
     <addaction name="actionSave_Log"/>
+    <addaction name="separator"/>
     <addaction name="actionExit"/>
    </widget>
    <widget class="QMenu" name="menuCommand">
@@ -161,6 +162,8 @@
     <addaction name="actionReturn"/>
     <addaction name="actionRelease"/>
     <addaction name="actionSetSpeed"/>
+    <addaction name="separator"/>
+    <addaction name="actionMovement_Controls"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -217,6 +220,11 @@
   <action name="actionSave_Log">
    <property name="text">
     <string>Save Log</string>
+   </property>
+  </action>
+  <action name="actionMovement_Controls">
+   <property name="text">
+    <string>Movement Controls</string>
    </property>
   </action>
  </widget>

@@ -18,7 +18,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionAbout,SIGNAL(triggered(bool)),this,SLOT(showAbout()));
     connect(ui->actionUsage,SIGNAL(triggered(bool)),this,SLOT(showHelp()));
     connect(ui->actionSave_Log,SIGNAL(triggered(bool)),this,SLOT(saveLog()));
+    connect(ui->actionMovement_Controls,SIGNAL(triggered(bool)),this,SLOT(movementControl()));
 
+    ui->actionMovement_Controls->setVisible(movementControlEnable);
 }
 
 MainWindow::~MainWindow(){
@@ -91,6 +93,8 @@ void MainWindow::changeConnectionStatus(Connection::connectionStatus status,QStr
         ui->actionConnect->setText("Connect");
         connected = false;
 
+        movementControlWindow->close();
+
         QMessageBox::StandardButton reply;
         reply = QMessageBox::warning(this, "Error", "Connection Lost.\nReconnect?",QMessageBox::Yes|QMessageBox::No);
         if (reply == QMessageBox::Yes){createConnection();}
@@ -118,6 +122,11 @@ void MainWindow::threadFinished(){
     delete thread;
     delete connection;
     delete handler;
+}
+
+void MainWindow::enableMainWindow()
+{
+    this->setEnabled(!this->isEnabled());
 }
 void MainWindow::saveLog(){
     if(logDataToSave->isEmpty()){
@@ -194,3 +203,13 @@ void MainWindow::batteryLevelWarning(){QMessageBox::warning(this, "Warning", "Lo
 
 void MainWindow::showHelp(){QMessageBox::information(this, "Help", "Connect to the Robot using the Connect button in the File menu.\n\nAfter connecting, send commands to the Robot using the commands found under the Commands menu.\n\nThe logs can be saved to a file using the Save Log button in the File menu.",QMessageBox::Yes);}
 void MainWindow::showAbout(){ QMessageBox::information(this, "About", "This program is used to remotely control a Robot\n\nVersion 1.0",QMessageBox::Yes);}
+
+void MainWindow::movementControl()
+{
+    movementControlWindow = new ControlForm(nullptr,handler);
+    movementControlWindow->setAttribute(Qt::WA_DeleteOnClose);
+    connect(movementControlWindow,SIGNAL(destroyed(QObject*)),this,SLOT(enableMainWindow()));
+    movementControlWindow->show();
+
+    enableMainWindow();
+}

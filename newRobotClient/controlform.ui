@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ControlForm</class>
+ <widget class="QWidget" name="ControlForm">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>488</width>
+    <height>362</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MovementControls</string>
+  </property>
+  <widget class="QPushButton" name="upButton">
+   <property name="geometry">
+    <rect>
+     <x>210</x>
+     <y>40</y>
+     <width>51</width>
+     <height>71</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>UP</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="downButton">
+   <property name="geometry">
+    <rect>
+     <x>210</x>
+     <y>230</y>
+     <width>51</width>
+     <height>71</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>DOWN</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="leftButton">
+   <property name="geometry">
+    <rect>
+     <x>100</x>
+     <y>140</y>
+     <width>71</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>LEFT</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="rightButton">
+   <property name="geometry">
+    <rect>
+     <x>300</x>
+     <y>140</y>
+     <width>71</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>RIGHT</string>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

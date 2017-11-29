@@ -12,6 +12,7 @@
 
 #include <connection.h>
 #include <datahandler.h>
+#include <controlform.h>
 
 
 namespace Ui {
@@ -43,6 +44,7 @@ private slots:
     void showAbout();
 
     void threadFinished();
+    void enableMainWindow();
     void sendHalt();
     void sendReturn();
     void sendRelease();
@@ -51,9 +53,11 @@ private slots:
 
     void saveLog();
 
+    void movementControl();
 
 private:
     Ui::MainWindow *ui;
+    ControlForm* movementControlWindow;
 
     QThread *thread;
     Connection *connection;
@@ -61,6 +65,8 @@ private:
     DataHandler *handler;
 
     bool connected = false;
+
+    bool movementControlEnable = true;
 signals:
     void closeConnection();
 };
