@@ -44,7 +44,7 @@ private slots:
     void showAbout();
 
     void threadFinished();
-    void enableMainWindow();
+    void deleteMovementWindow();
     void sendHalt();
     void sendReturn();
     void sendRelease();

@@ -93,7 +93,9 @@ void MainWindow::changeConnectionStatus(Connection::connectionStatus status,QStr
         ui->actionConnect->setText("Connect");
         connected = false;
 
-        movementControlWindow->close();
+        if(movementControlWindow != nullptr){
+            movementControlWindow->close();
+        }
 
         QMessageBox::StandardButton reply;
         reply = QMessageBox::warning(this, "Error", "Connection Lost.\nReconnect?",QMessageBox::Yes|QMessageBox::No);
@@ -124,10 +126,12 @@ void MainWindow::threadFinished(){
     delete handler;
 }
 
-void MainWindow::enableMainWindow()
+void MainWindow::deleteMovementWindow()
 {
-    this->setEnabled(!this->isEnabled());
+    movementControlWindow = nullptr;
+    this->setEnabled(true);
 }
+
 void MainWindow::saveLog(){
     if(logDataToSave->isEmpty()){
         QMessageBox::warning(this, "Warning", "No new log data",QMessageBox::Yes);
@@ -208,8 +212,8 @@ void MainWindow::movementControl()
 {
     movementControlWindow = new ControlForm(nullptr,handler);
     movementControlWindow->setAttribute(Qt::WA_DeleteOnClose);
-    connect(movementControlWindow,SIGNAL(destroyed(QObject*)),this,SLOT(enableMainWindow()));
+    connect(movementControlWindow,SIGNAL(destroyed(QObject*)),this,SLOT(deleteMovementWindow()));
     movementControlWindow->show();
 
-    enableMainWindow();
+    this->setEnabled(false);
 }
