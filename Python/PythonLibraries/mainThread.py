@@ -20,10 +20,9 @@ serverThread.start()
 movementThread.setDaemon(True)
 movementThread.start()
 
-dbThread.start()
 dbThread.setDaemon(True)
+dbThread.start()
 
-#data = {"BatteryLevel" : 100, "Speed": 100, "Action" : "MovingLeft", "Task": "DeliveringItems"}
 def checkCommand(receivedData):
     print(receivedData)
     if(receivedData["Command"] == "Halt"):
@@ -37,6 +36,8 @@ def checkCommand(receivedData):
     elif(receivedData["Command"] == "SetSpeed"):
         pass
         #movementThread.insertMovementQueue(movementThread.setSpeed,int(receivedData["Value"]))
+    elif(receivedData["Command"] == "RegisterRobot"):
+        movementThread.insertMovementQueue(movementThread.robotAuth, receivedData["RobotId"],receivedData["RobotPassword"])
 
 def checkQueue():
     try:
@@ -44,8 +45,9 @@ def checkQueue():
         if(type(source) == RobotServer.RobotServer or type(source) == DatabaseConnection.DatabaseConnection):
             checkCommand(DataParser.parseData(data))
         elif(type(source) == RobotMovement.RobotMovement):
-            serverThread.insertServerQueue(serverThread.sendData,DataParser.createDataPacket(data))
-            dbThread.insertDBQueue(dbThread.sendData,DataParser.createDatabasePacket(data))
+            serverThread.insertServerQueue(serverThread.sendData,DataParser.createServerPacket(data))
+            if(data["robotID"] != None):
+                dbThread.insertDBQueue(dbThread.sendData,DataParser.createDatabasePacket(data))
     except Queue.Empty:
         return
 

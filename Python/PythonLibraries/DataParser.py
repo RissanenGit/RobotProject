@@ -10,28 +10,14 @@ def parseData(data):
 def createServerPacket(data):
     packet = ""
     for key in data:
-        if(key == "EventType"):
-            packet = packet + key + ":" + getEventType(key) + "\n"
-        else:
-            packet = packet + key + ":" + str(data[key]) + "\n"
+        packet = packet + key + ":" + str(data[key]) + "\n"
     return packet
 
-def getEventType(data):
-    if data["EventType"] == 1:
-        return "Forward"
-    elif data["EventType"] == 2:
-        return "BackWards"
-    elif data["EventType"] == 3:
-        return "Left"
-    elif data["EventType"] == 4:
-        return "Right"
-    else:
-        return "UnkownEvent"
 def createDatabasePacket(data):
 
-    message = b'------Boundary\r\nContent-Disposition: form-data; name="idrobot"\r\n\r\n4\r\n'
-    message = message + b'------Boundary\r\nContent-Disposition: form-data; name="salasana"\r\n\r\n123\r\n'
-    message = message + b'------Boundary\r\nContent-Disposition: form-data; name="event_type"\r\n\r\n' + data["EventType"]+ '\r\n'
+    message = b'------Boundary\r\nContent-Disposition: form-data; name="idrobot"\r\n\r\n'+ str(data["robotID"])+'\r\n'
+    message = message + b'------Boundary\r\nContent-Disposition: form-data; name="salasana"\r\n\r\n'+ str(data["robotPW"])+'\r\n'
+    message = message + b'------Boundary\r\nContent-Disposition: form-data; name="event_type"\r\n\r\n' + str(data["EventType"])+ '\r\n'
     message = message + b'------Boundary\r\nContent-Disposition: form-data; name="event_data"\r\n\r\n' + data["EventData"]+'\r\n'
     message = message + b'------Boundary\r\nContent-Disposition: form-data; name="akku"\r\n\r\n' + str(data["BatteryLevel"]) + '\r\n'
     message = message + b'------Boundary--\r\n'
