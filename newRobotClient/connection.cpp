@@ -28,8 +28,8 @@ bool Connection::retryConnection(){ //Handles reconnecting to the server
     QThread::msleep(retryTimeout);
     for(int i = 0;i < retryCount; i++){ //Try (5) times to connect to the server
         qDebug() << "Retry " << i + 1;
-        emit connectionStatusChanged(connectionStatus::Connecting,QStringLiteral("Connecting... (Retry: %1)").arg(i + 1));//Update UI on the reconnection status
         QThread::msleep(retryTimeout); //Sleep for 5 seconds, give time for the server to come up
+        emit connectionStatusChanged(connectionStatus::Connecting,QStringLiteral("Connecting... (Retry: %1)").arg(i + 1));//Update UI on the reconnection status
         socket->connectToHost(address,port);
         if(socket->waitForConnected(5000)){
             qDebug() << "Connection re-established";

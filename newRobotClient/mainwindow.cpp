@@ -174,17 +174,17 @@ void MainWindow::sendSpeed(){
     QString message = QStringLiteral("New speed: (Current: %1 )").arg(handler->speed());
     int speed = QInputDialog::getInt(this,message,tr("Speed:"), QLineEdit::Normal,0,100,1,&ok);
 
-    if(ok){
-        handler->createMessage(DataHandler::SetSpeed,QList<QString>{QString::number(speed)});
-    }
+    if(!ok || !connected){return;}
+
+    handler->createMessage(DataHandler::SetSpeed,QList<QString>{QString::number(speed)});
 }
 
 void MainWindow::sendRobotRegister(){
     bool ok;
     int robotID = QInputDialog::getInt(this,"Enter robot ID",tr("RobotID:"), QLineEdit::Normal,0,100,1,&ok);
-    if(!ok){return;}
-    QString robotPassword = QInputDialog::getText(this,"Enter robot password",tr("RobotPassword:"), QLineEdit::Normal,"",&ok);
-    if(!ok){return;}
+    if(!ok || !connected){return;}
+    QString robotPassword = QInputDialog::getText(this,"Enter robot password",tr("RobotPassword:"), QLineEdit::Password ,"",&ok);
+    if(!ok || !connected){return;}
 
     handler->createMessage(DataHandler::RegisterRobot,QList<QString>{QString::number(robotID),robotPassword});
 }

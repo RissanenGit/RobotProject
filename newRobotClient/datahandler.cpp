@@ -9,19 +9,19 @@ void DataHandler::logEvent(eventType event, QList<QString> eventData)
     QString message = "";
     switch (event) {
     case Connected:
-        message = "Connected to Server";
+        message = "Connected to Robot";
         break;
     case Connecting:
-        message = "Connecting to Server";
+        message = "Connecting to Robot";
         break;
     case Disconnected:
-        message = "Disconnected from Server";
+        message = "Disconnected from Robot";
         break;
     case SentData:
-        message = "Sent Data to Server";
+        message = "Sent Data to Robot";
         break;
     case ReceivedData:
-        message = "Received Data From Server ";
+        message = "Data from robot";
         break;
     default:
         break;
@@ -43,20 +43,6 @@ void DataHandler::checkBatteryLevel()
         errorList[LowBattery] = false;
     }
 }
-
-QString DataHandler::getRobotEvent(int event){
-    switch (event) {
-    case QRNodeFound:
-        break;
-    case PathBlocked:
-        break;
-    case SearchingWall:
-        break;
-    default:
-        break;
-    }
-}
-
 void DataHandler::createMessage(messageTypes messageType, QList<QString> additionalData)
 {
     QByteArray message = "";
@@ -96,23 +82,24 @@ void DataHandler::parseData(QByteArray data){
             QString contentValue = content[i].split(':')[1];
             if(contentData == "BatteryLevel"){
                 _batteryLevel = contentValue.toFloat() / 1000;
-            }
-            else if(contentData == "EventType"){
-                //_action = getRobotEvent(contentValue.toInt());
+                receivedData.append(contentData + ":" + QString::number((contentValue.toFloat()/1000)));
             }
             else if(contentData == "EventData"){
                 _action = contentValue;
+                receivedData.append(contentData + ":" + contentValue);
             }
             else if(contentData == "Speed"){
                 _speed = contentValue.toInt();
+                receivedData.append(contentData + ":" + contentValue);
             }
             else if(contentData == "robotID"){
                 _robotId = contentValue;
+                receivedData.append(contentData + ":" + contentValue);
             }
             else{
-                qDebug() << "UnknownData" << contentData;
+                qDebug() << "Data not wanted: " << contentData;
             }
-            receivedData.append(contentData + ":" + content[i].split(':')[1]);
+
         }
     }
     logEvent(ReceivedData,receivedData);

@@ -14,7 +14,6 @@ public:
     enum dataTypes{BatteryLevel,Action,Task};
     enum messageTypes{Halt,Return,Release,SetSpeed,RegisterRobot};
     enum eventType{Connected,Connecting,Disconnected,SentData,ReceivedData};
-    enum robotEvents{QRNodeFound,PathBlocked,SearchingWall};
 
     float batteryLevel(){return _batteryLevel;}
     int speed(){return _speed;}
@@ -31,7 +30,6 @@ private:
     QString _robotId = "None";
     QString _action = "";
     void checkBatteryLevel();
-    QString getRobotEvent(int event);
 
     enum errorTypes{LowBattery};
     QMap<errorTypes,bool> errorList {{LowBattery,false}};
