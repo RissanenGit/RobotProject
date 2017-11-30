@@ -6,23 +6,23 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow){
     ui->setupUi(this);
 
-    //Connect menu actions
-    connect(ui->actionConnect,SIGNAL(triggered(bool)),this,SLOT(connectClicked()));
-    connect(ui->actionExit,SIGNAL(triggered(bool)),this,SLOT(close()));
+    //Connecting menu actions
+    connect(ui->actionConnect,SIGNAL(triggered(bool)),this,SLOT(connectClicked())); //Connect button
+    connect(ui->actionExit,SIGNAL(triggered(bool)),this,SLOT(close())); //Exit button
 
-    connect(ui->actionHalt,SIGNAL(triggered(bool)),this,SLOT(sendHalt()));
-    connect(ui->actionReturn,SIGNAL(triggered(bool)),this,SLOT(sendReturn()));
-    connect(ui->actionRelease,SIGNAL(triggered(bool)),this,SLOT(sendRelease()));
-    connect(ui->actionSetSpeed,SIGNAL(triggered(bool)),this,SLOT(sendSpeed()));
-    connect(ui->actionRegisterRobot,SIGNAL(triggered(bool)),this,SLOT(sendRobotRegister()));
+    connect(ui->actionHalt,SIGNAL(triggered(bool)),this,SLOT(sendHalt())); //Halt Command Button
+    connect(ui->actionReturn,SIGNAL(triggered(bool)),this,SLOT(sendReturn())); //Return Command Button
+    connect(ui->actionRelease,SIGNAL(triggered(bool)),this,SLOT(sendRelease())); //Release Command Button
+    connect(ui->actionSetSpeed,SIGNAL(triggered(bool)),this,SLOT(sendSpeed())); //SetSpeed Command Button
+    connect(ui->actionRegisterRobot,SIGNAL(triggered(bool)),this,SLOT(sendRobotRegister())); //RegisterRobot Command Button
 
-    connect(ui->actionAbout,SIGNAL(triggered(bool)),this,SLOT(showAbout()));
-    connect(ui->actionUsage,SIGNAL(triggered(bool)),this,SLOT(showHelp()));
+    connect(ui->actionAbout,SIGNAL(triggered(bool)),this,SLOT(showAbout())); //ShowAbout button
+    connect(ui->actionUsage,SIGNAL(triggered(bool)),this,SLOT(showHelp())); //ShowHelp button
 
-    connect(ui->actionSave_Log,SIGNAL(triggered(bool)),this,SLOT(saveLog()));
-    connect(ui->actionMovement_Controls,SIGNAL(triggered(bool)),this,SLOT(movementControl()));
+    connect(ui->actionSave_Log,SIGNAL(triggered(bool)),this,SLOT(saveLog())); //SaveLog button
+    connect(ui->actionMovement_Controls,SIGNAL(triggered(bool)),this,SLOT(movementControl())); //MovementControlWindow button
 
-    ui->actionMovement_Controls->setVisible(movementControlEnable);
+    ui->actionMovement_Controls->setVisible(movementControlEnable); //Disable/Enable MovementControlWindow
 }
 
 MainWindow::~MainWindow(){
@@ -31,8 +31,8 @@ MainWindow::~MainWindow(){
 }
 
 ///Functions->
-void MainWindow::connectSignals(){
-    connect(thread,SIGNAL(started()),connection,SLOT(createConnection()));
+void MainWindow::connectSignals(){ //Connecting all the signals necessary for operation
+    connect(thread,SIGNAL(started()),connection,SLOT(createConnection())); //thread->connection | When the thread is started, create the socket in connection
 
     connect(connection,SIGNAL(connectionStatusChanged(Connection::connectionStatus,QString)),this,SLOT(changeConnectionStatus(Connection::connectionStatus,QString))); //connection->this | For updating connection status in UI
     qRegisterMetaType<Connection::connectionStatus>("Connection::connectionStatus"); //Required for Connection::connectionStatus enum
@@ -44,14 +44,14 @@ void MainWindow::connectSignals(){
 
     connect(connection,SIGNAL(dataReady(QByteArray)),handler,SLOT(parseData(QByteArray))); //connection->handler | Data is ready at socket, send it to DataHandler
 
-    connect(handler,SIGNAL(updateValues()),this,SLOT(updateUiValues())); //handler->this | Temporary for displaying values in UI
+    connect(handler,SIGNAL(updateValues()),this,SLOT(updateUiValues())); //handler->this | Updating UI values
     connect(handler,SIGNAL(sendMessage(QByteArray)),connection,SLOT(sendData(QByteArray))); //handler->connection | Temporary for sending messages via socket
 
-    connect(handler,SIGNAL(sendLogData(QString)),this,SLOT(updateLog(QString))); //For data logging
-    connect(handler,SIGNAL(lowBatteryWarning()),this,SLOT(batteryLevelWarning()));
+    connect(handler,SIGNAL(sendLogData(QString)),this,SLOT(updateLog(QString))); //handler->this | Upading the logview in UI
+    connect(handler,SIGNAL(lowBatteryWarning()),this,SLOT(batteryLevelWarning())); //handler->this | If battery is below threshold, show a warning popup
 }
 
-void MainWindow::createConnection(){
+void MainWindow::createConnection(){ //Creating objects and starting the thread
     thread = new QThread();
     connection = new Connection(nullptr,ipAddress,port);
     handler = new DataHandler();
@@ -64,7 +64,7 @@ void MainWindow::createConnection(){
 }
 
 ///Slots->
-void MainWindow::changeConnectionStatus(Connection::connectionStatus status,QString statusText){
+void MainWindow::changeConnectionStatus(Connection::connectionStatus status,QString statusText){ //Called from connection, to update the connection status in the UI elements
     ui->statusLabel->setText(statusText);
     switch (status){
     case Connection::Connecting:
@@ -93,31 +93,31 @@ void MainWindow::changeConnectionStatus(Connection::connectionStatus status,QStr
         ui->actionConnect->setText("Connect");
         connected = false;
 
-        if(movementWindowOpen){
+        if(movementWindowOpen){ //If the connection drops, while the MovementControlWindow is open, close it
             movementControlWindow->close();
         }
 
         QMessageBox::StandardButton reply;
         reply = QMessageBox::warning(this, "Error", "Connection Lost.\nReconnect?",QMessageBox::Yes|QMessageBox::No);
-        if (reply == QMessageBox::Yes){createConnection();}
+        if (reply == QMessageBox::Yes){createConnection();} //Possibility to reconnect without re-entering IP and PORT
         break;
     default:
         break;
     }
 }
 
-void MainWindow::updateUiValues(){
+void MainWindow::updateUiValues(){ //Updating values in the UI
     ui->batteryLabel->setText(QString::number((handler->batteryLevel())));
     ui->speedLabel->setText(QString::number(handler->speed()));
     ui->actionLabel->setText(handler->action());
     ui->robotIdLabel->setText(handler->robotId());
 }
-void MainWindow::updateLog(QString data){
+void MainWindow::updateLog(QString data){ //Updating the log in the UI
     ui->logView->append(data);
     logDataToSave->append(data + "\n");
 }
-void MainWindow::threadFinished(){
-    while(!thread->isFinished()){}
+void MainWindow::threadFinished(){ //Called from the connection, when we are exiting the thread
+    while(!thread->isFinished()){} //Wait for thread to properely finish
 
     qDebug() << "Thread finished";
 
@@ -126,12 +126,12 @@ void MainWindow::threadFinished(){
     delete handler;
 }
 
-void MainWindow::movementWindowAction(){
+void MainWindow::movementWindowAction(){ //Called when opening / closing the MovementControlWindow
     this->setEnabled(!this->isEnabled());
     movementWindowOpen = !movementWindowOpen;
 }
 
-void MainWindow::saveLog(){
+void MainWindow::saveLog(){ //Called when pressing the "SaveLog" button. Handles reading the log file and appending new data into it
     if(logDataToSave->isEmpty()){
         QMessageBox::warning(this, "Warning", "No new log data",QMessageBox::Yes);
         return;
@@ -166,9 +166,9 @@ void MainWindow::saveLog(){
     *logDataToSave = "";
     QMessageBox::information(this, "Success", "Log saved",QMessageBox::Yes);
 }
-void MainWindow::sendHalt(){handler->createMessage(DataHandler::Halt);}
-void MainWindow::sendReturn(){handler->createMessage(DataHandler::Return);}
-void MainWindow::sendRelease(){handler->createMessage(DataHandler::Release);}
+void MainWindow::sendHalt(){handler->createMessage(DataHandler::Halt);} //Called when Halt Command Button is pressed
+void MainWindow::sendReturn(){handler->createMessage(DataHandler::Return);}//Called when Return Command Button is pressed
+void MainWindow::sendRelease(){handler->createMessage(DataHandler::Release);}//Called when Release Command Button is pressed
 void MainWindow::sendSpeed(){
     bool ok;
     QString message = QStringLiteral("New speed: (Current: %1 )").arg(handler->speed());

@@ -64,15 +64,11 @@ void Connection::createConnection(){ //Entrypoint
 }
 
 void Connection::readData(){ //Handles the incoming data from server
-    //qDebug() << "Reading data from socket";
     emit dataReady(socket->readAll());
 }
 
 void Connection::sendData(QByteArray data){
     qDebug() << "Sending data to socket: " << data;
-    //qDebug() << "Socket: " << socket;
-    //qDebug() << "Data address: " << &data;
-
     socket->write(data);
 }
 

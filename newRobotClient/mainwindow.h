@@ -45,29 +45,30 @@ private slots:
 
     void threadFinished();
     void movementWindowAction();
+
     void sendHalt();
     void sendReturn();
     void sendRelease();
     void sendSpeed();
     void sendRobotRegister();
-    void batteryLevelWarning();
 
+    void batteryLevelWarning();
     void saveLog();
 
     void movementControl();
 
 private:
     Ui::MainWindow *ui;
-    ControlForm* movementControlWindow;
 
+    ControlForm* movementControlWindow;
     QThread *thread;
     Connection *connection;
-
     DataHandler *handler;
 
     bool connected = false;
+
     bool movementWindowOpen = false;
-    bool movementControlEnable = true;
+    bool movementControlEnable = false; //Is MovementControlWindow enabled?
 signals:
     void closeConnection();
 };
