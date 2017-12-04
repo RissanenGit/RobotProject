@@ -184,13 +184,14 @@
     <property name="title">
      <string>Commands</string>
     </property>
-    <addaction name="actionRegisterRobot"/>
     <addaction name="actionHalt"/>
     <addaction name="actionReturn"/>
     <addaction name="actionRelease"/>
     <addaction name="actionSetSpeed"/>
+    <addaction name="actionGoToWaypoint"/>
     <addaction name="separator"/>
     <addaction name="actionMovement_Controls"/>
+    <addaction name="actionRegisterRobot"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -208,55 +209,111 @@
    <property name="text">
     <string>Connect</string>
    </property>
+   <property name="statusTip">
+    <string>Connect / Disconnect from Robot</string>
+   </property>
   </action>
   <action name="actionHalt">
    <property name="text">
     <string>Halt</string>
+   </property>
+   <property name="toolTip">
+    <string>Halt</string>
+   </property>
+   <property name="statusTip">
+    <string>Order Robot to stop all actions</string>
    </property>
   </action>
   <action name="actionReturn">
    <property name="text">
     <string>Return</string>
    </property>
+   <property name="statusTip">
+    <string>Order Robot to return</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
   </action>
   <action name="actionRelease">
    <property name="text">
     <string>Release</string>
+   </property>
+   <property name="statusTip">
+    <string>Order Robot to continue it's action</string>
    </property>
   </action>
   <action name="actionSetSpeed">
    <property name="text">
     <string>SetSpeed</string>
    </property>
+   <property name="statusTip">
+    <string>Set movement speed of the Robot</string>
+   </property>
   </action>
   <action name="actionExit">
    <property name="text">
     <string>Exit</string>
+   </property>
+   <property name="statusTip">
+    <string>Close program</string>
    </property>
   </action>
   <action name="actionUsage">
    <property name="text">
     <string>Help</string>
    </property>
+   <property name="toolTip">
+    <string>Help</string>
+   </property>
+   <property name="statusTip">
+    <string>How to use the program</string>
+   </property>
+   <property name="whatsThis">
+    <string/>
+   </property>
   </action>
   <action name="actionAbout">
    <property name="text">
     <string>About</string>
+   </property>
+   <property name="statusTip">
+    <string>Information about the program</string>
    </property>
   </action>
   <action name="actionSave_Log">
    <property name="text">
     <string>Save Log</string>
    </property>
+   <property name="statusTip">
+    <string>Save Log to an external file</string>
+   </property>
   </action>
   <action name="actionMovement_Controls">
    <property name="text">
     <string>Movement Controls</string>
    </property>
+   <property name="statusTip">
+    <string>Open Movement Control Window</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
   </action>
   <action name="actionRegisterRobot">
    <property name="text">
     <string>RegisterRobot</string>
+   </property>
+   <property name="statusTip">
+    <string>Register Robot to the Database</string>
+   </property>
+  </action>
+  <action name="actionGoToWaypoint">
+   <property name="text">
+    <string>GoToWaypoint</string>
+   </property>
+   <property name="statusTip">
+    <string>Order Robot to go to specific waypoint</string>
    </property>
   </action>
  </widget>

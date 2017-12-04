@@ -21,8 +21,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(ui->actionSave_Log,SIGNAL(triggered(bool)),this,SLOT(saveLog())); //SaveLog button
     connect(ui->actionMovement_Controls,SIGNAL(triggered(bool)),this,SLOT(movementControl())); //MovementControlWindow button
-
-    ui->actionMovement_Controls->setVisible(movementControlEnable); //Disable/Enable MovementControlWindow
+    connect(ui->actionGoToWaypoint,SIGNAL(triggered(bool)),this,SLOT(sendGoToWaypoint()));
 }
 
 MainWindow::~MainWindow(){
@@ -31,7 +30,7 @@ MainWindow::~MainWindow(){
 }
 
 ///Functions->
-void MainWindow::connectSignals(){ //Connecting all the signals necessary for operation
+void MainWindow::connectSignals(){ //Connecting all the signals necessary for operation (thread,connection,handler)
     connect(thread,SIGNAL(started()),connection,SLOT(createConnection())); //thread->connection | When the thread is started, create the socket in connection
 
     connect(connection,SIGNAL(connectionStatusChanged(Connection::connectionStatus,QString)),this,SLOT(changeConnectionStatus(Connection::connectionStatus,QString))); //connection->this | For updating connection status in UI
@@ -132,13 +131,13 @@ void MainWindow::movementWindowAction(){ //Called when opening / closing the Mov
 }
 
 void MainWindow::saveLog(){ //Called when pressing the "SaveLog" button. Handles reading the log file and appending new data into it
-    if(logDataToSave->isEmpty()){
+    if(logDataToSave->isEmpty()){ //No new data in the variable
         QMessageBox::warning(this, "Warning", "No new log data",QMessageBox::Yes);
         return;
     }
     QFile file("log.txt");
     bool hasDate = false;
-    if(file.exists()){
+    if(file.exists()){ //Used for reading the file for currentdate
         if (!file.open(QIODevice::ReadOnly | QIODevice::Text)){
             QMessageBox::warning(this, "Warning", file.errorString(),QMessageBox::Yes);
             return;
@@ -158,12 +157,12 @@ void MainWindow::saveLog(){ //Called when pressing the "SaveLog" button. Handles
     }
     QTextStream out(&file);
 
-    if(!hasDate){
+    if(!hasDate){ //File has no date for currentDate, add it
         out << QDate::currentDate().toString("d.M.yyyy") << "\n----------------------------------------\n";
     }
-    out << *logDataToSave << "\n";
+    out << *logDataToSave << "\n"; //Write data
     file.close();
-    *logDataToSave = "";
+    *logDataToSave = ""; //Set data to save to none
     QMessageBox::information(this, "Success", "Log saved",QMessageBox::Yes);
 }
 void MainWindow::sendHalt(){handler->createMessage(DataHandler::Halt);} //Called when Halt Command Button is pressed
@@ -171,15 +170,13 @@ void MainWindow::sendReturn(){handler->createMessage(DataHandler::Return);}//Cal
 void MainWindow::sendRelease(){handler->createMessage(DataHandler::Release);}//Called when Release Command Button is pressed
 void MainWindow::sendSpeed(){
     bool ok;
-    QString message = QStringLiteral("New speed: (Current: %1 )").arg(handler->speed());
-    int speed = QInputDialog::getInt(this,message,tr("Speed:"), QLineEdit::Normal,0,100,1,&ok);
-
+    int speed = QInputDialog::getInt(this,"New speed:",tr("Speed:"), QLineEdit::Normal,0,handler->maxSpeed,1,&ok);
     if(!ok || !connected){return;}
 
     handler->createMessage(DataHandler::SetSpeed,QList<QString>{QString::number(speed)});
 }
 
-void MainWindow::sendRobotRegister(){
+void MainWindow::sendRobotRegister(){//Called when RobotRegister Command Button is pressed
     bool ok;
     int robotID = QInputDialog::getInt(this,"Enter robot ID",tr("RobotID:"), QLineEdit::Normal,0,100,1,&ok);
     if(!ok || !connected){return;}
@@ -188,8 +185,23 @@ void MainWindow::sendRobotRegister(){
 
     handler->createMessage(DataHandler::RegisterRobot,QList<QString>{QString::number(robotID),robotPassword});
 }
-void MainWindow::connectClicked(){
-    if(!connected){
+
+void MainWindow::sendGoToWaypoint()
+{
+    QInputDialog dialog;
+    QStringList items(QList<QString>{"Etappi1","Etappi2","Etappi3"}); //Options in the dialog window
+
+    dialog.setOptions(QInputDialog::UseListViewForComboBoxItems);
+    dialog.setComboBoxItems(items);
+    dialog.setWindowTitle("Choose waypoint");
+    dialog.setFixedSize(100,100);
+
+    if(dialog.exec() && connected){ //Exec returns 1 or true when OK is pressed, also check if connection is still active
+        handler->createMessage(DataHandler::GoToWaypoint,QList<QString>{dialog.textValue()}); //Get selected value from dialog and send it
+    }
+}
+void MainWindow::connectClicked(){//Called when Connect/Disconnect Button is pressed
+    if(!connected){ //Disconnected, create new connection
         bool ok;
         QString text = QInputDialog::getText(this, tr("Enter address"),tr("Address:"), QLineEdit::Normal,"192.168.1.63:9999",&ok);
         if(!ok){return;}
@@ -206,16 +218,16 @@ void MainWindow::connectClicked(){
 
         createConnection();
     }
-    else{
+    else{//Connected, disconnect
         emit closeConnection();
     }
 }
-void MainWindow::batteryLevelWarning(){QMessageBox::warning(this, "Warning", "Low battery on Robot",QMessageBox::Yes);}
+void MainWindow::batteryLevelWarning(){QMessageBox::warning(this, "Warning", "Low battery on Robot",QMessageBox::Yes);} //Display low battery warning
 
 void MainWindow::showHelp(){QMessageBox::information(this, "Help", "Connect to the Robot using the Connect button in the File menu.\n\nAfter connecting, send commands to the Robot using the commands found under the Commands menu.\n\nThe logs can be saved to a file using the Save Log button in the File menu.",QMessageBox::Yes);}
 void MainWindow::showAbout(){ QMessageBox::information(this, "About", "This program is used to remotely control a Robot\n\nVersion 1.0",QMessageBox::Yes);}
 
-void MainWindow::movementControl(){
+void MainWindow::movementControl(){ //Open MovementControlWindow
     movementControlWindow = new ControlForm(nullptr,handler);
     movementControlWindow->setAttribute(Qt::WA_DeleteOnClose);
     connect(movementControlWindow,SIGNAL(destroyed(QObject*)),this,SLOT(movementWindowAction()));

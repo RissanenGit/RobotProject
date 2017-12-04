@@ -12,7 +12,7 @@ public:
     DataHandler(QObject *parent = nullptr);
     ~DataHandler();
     enum dataTypes{BatteryLevel,Action,Task};
-    enum messageTypes{Halt,Return,Release,SetSpeed,RegisterRobot};
+    enum messageTypes{Halt,Return,Release,SetSpeed,RegisterRobot,GoToWaypoint};
     enum eventType{Connected,Connecting,Disconnected,SentData,ReceivedData};
 
     float batteryLevel(){return _batteryLevel;}
@@ -22,6 +22,8 @@ public:
 
     void createMessage(messageTypes messageType, QList<QString> additionalData = QList<QString>());
     void logEvent(eventType event, QList<QString> eventData = QList<QString>());
+
+    const int maxSpeed = 1000;
 private:
     const float lowBatteryLevel = 10;
 

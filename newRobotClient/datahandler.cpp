@@ -65,6 +65,10 @@ void DataHandler::createMessage(messageTypes messageType, QList<QString> additio
     case SetSpeed:
         message = "Command:SetSpeed,Value:";
         message += additionalData[0];
+        break;
+    case GoToWaypoint:
+        message = "Command:GotoWaypoint,Value:";
+        message += additionalData[0];
     default:
         break;
     }

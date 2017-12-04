@@ -51,6 +51,7 @@ private slots:
     void sendRelease();
     void sendSpeed();
     void sendRobotRegister();
+    void sendGoToWaypoint();
 
     void batteryLevelWarning();
     void saveLog();
@@ -66,9 +67,7 @@ private:
     DataHandler *handler;
 
     bool connected = false;
-
     bool movementWindowOpen = false;
-    bool movementControlEnable = false; //Is MovementControlWindow enabled?
 signals:
     void closeConnection();
 };
