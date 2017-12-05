@@ -21,7 +21,7 @@ private:
 
     const int retryCount = 5;
     const int retryTimeout = 5000;
-    bool retry = false; //socket.write not working after reconnect
+    bool retry = false; //socket.write not working after automatic reconnecting
 
     void connectSignals();
     void disconnectSignals();

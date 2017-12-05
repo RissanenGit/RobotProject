@@ -2,7 +2,11 @@ import socket
 import threading
 import time
 import Queue
+import psutil
 
+p=psutil.Process()
+p.cpu_affinity([1])
+print("DatabseConnection running on core " + str(p.cpu_affinity()))
 class DatabaseConnection(threading.Thread):
     def __init__(self, mainQueue):
         super(DatabaseConnection, self).__init__()
@@ -21,7 +25,7 @@ class DatabaseConnection(threading.Thread):
 
     def checkQueue(self): #Used for checking the queue
         try:
-            function, args= self.queue.get(timeout=0.5)
+            function, args= self.queue.get(timeout=0.1)
             function(*args)
         except Queue.Empty:
             return False
@@ -62,5 +66,4 @@ class DatabaseConnection(threading.Thread):
                         break
                 except socket.error: #Socket timeout in receiving data
                     pass
-                time.sleep(1)
             print("DB disconnected: ", address) #Exited from inner loop, client disconnected

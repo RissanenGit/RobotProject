@@ -7,6 +7,11 @@ import DatabaseConnection
 import RobotMovement
 
 import DataParser
+import psutil
+
+p=psutil.Process()
+p.cpu_affinity([0])
+print("mainThread running on core " + str(p.cpu_affinity()))
 
 mainQueue = Queue.Queue()
 
@@ -28,20 +33,21 @@ def checkCommand(receivedData):
     if(receivedData["Command"] == "Halt"):
         movementThread.insertMovementQueue(movementThread.setPanic)
     elif(receivedData["Command"] == "Release"):
-        pass
-        #movementThread.insertMovementQueue(movementThread.removePanic)
+        movementThread.insertMovementQueue(movementThread.removePanic)
     elif(receivedData["Command"] == "Return"):
         pass
         #movementThread.insertMovementQueue(movementThread.setReturn)
     elif(receivedData["Command"] == "SetSpeed"):
-        pass
+        movementThread.insertMovementQueue(movementThread.setMissionSpeed,int(receivedData["Value"]))
         #movementThread.insertMovementQueue(movementThread.setSpeed,int(receivedData["Value"]))
     elif(receivedData["Command"] == "RegisterRobot"):
         movementThread.insertMovementQueue(movementThread.robotAuth, receivedData["RobotId"],receivedData["RobotPassword"])
+    elif(receivedData["Command"] == "GotoWaypoint"):
+        movementThread.insertMovementQueue(movementThread.setWaypointTarget, str(receivedData["Value"]))
 
 def checkQueue():
     try:
-        data,source = mainQueue.get(timeout=0.1)
+        data,source = mainQueue.get(timeout=0.05)
         if(type(source) == RobotServer.RobotServer or type(source) == DatabaseConnection.DatabaseConnection):
             checkCommand(DataParser.parseData(data))
         elif(type(source) == RobotMovement.RobotMovement):

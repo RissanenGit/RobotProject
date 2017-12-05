@@ -4,7 +4,7 @@ DataHandler::DataHandler(QObject *parent) : QObject(parent){
 }
 DataHandler::~DataHandler(){}
 
-void DataHandler::logEvent(eventType event, QList<QString> eventData)
+void DataHandler::logEvent(eventType event, QList<QString> eventData)//Creating the string that gets shown in the UI log
 {
     QString message = "";
     switch (event) {
@@ -29,24 +29,24 @@ void DataHandler::logEvent(eventType event, QList<QString> eventData)
     for(int i = 0; i < eventData.length(); i++){
         message += " | " + eventData[i];
     }
-    emit sendLogData(QStringLiteral("[%1] %2").arg(QDateTime::currentDateTime().toString("HH:mm:ss")).arg(message));
+    emit sendLogData(QStringLiteral("[%1] %2").arg(QDateTime::currentDateTime().toString("HH:mm:ss")).arg(message));//Sending the data to the UI log slot
 }
 
-void DataHandler::checkBatteryLevel()
+void DataHandler::checkBatteryLevel() //Checking if batterylevel is below a certain threshold, and the alarm has not yet been triggered
 {
     if(_batteryLevel < lowBatteryLevel && errorList[LowBattery] == false){
         qDebug() << "LowBattery";
-        errorList[LowBattery] = true;
-        emit lowBatteryWarning();
+        errorList[LowBattery] = true; //Warning has been shown
+        emit lowBatteryWarning(); //Showing low battery warning in the UI
     }
-    else if(_batteryLevel > lowBatteryLevel + 20){
+    else if(_batteryLevel > 10.5){ //If battery is above a certain point, we can show the alarm again (Battery has been recharged)
         errorList[LowBattery] = false;
     }
 }
-void DataHandler::createMessage(messageTypes messageType, QList<QString> additionalData)
+void DataHandler::createMessage(messageTypes messageType, QList<QString> additionalData) //Creating the datastring sent to the robot via a socket
 {
     QByteArray message = "";
-    switch (messageType) {
+    switch (messageType) { //Checking what type of command we are sending
     case RegisterRobot:
         message = "Command:RegisterRobot,RobotId:";
         message += additionalData[0];
@@ -72,11 +72,11 @@ void DataHandler::createMessage(messageTypes messageType, QList<QString> additio
     default:
         break;
     }
-    logEvent(SentData,QList<QString>{message});
-    emit sendMessage(message);
+    logEvent(SentData,QList<QString>{message}); //Logging the event
+    emit sendMessage(message); //Sending data to the socket
 }
 
-void DataHandler::parseData(QByteArray data){
+void DataHandler::parseData(QByteArray data){ //Slot handles parsing the data received from the robot to the different variables
 
     QList<QByteArray>content = data.split('\n');
     QList<QString>receivedData;
@@ -86,7 +86,7 @@ void DataHandler::parseData(QByteArray data){
             QString contentValue = content[i].split(':')[1];
             if(contentData == "BatteryLevel"){
                 _batteryLevel = contentValue.toFloat() / 1000;
-                receivedData.append(contentData + ":" + QString::number((contentValue.toFloat()/1000)));
+                receivedData.append(contentData + ":" + QString::number((contentValue.toFloat()/1000))); //Converting the voltage from mV to V
             }
             else if(contentData == "EventData"){
                 _action = contentValue;
@@ -100,15 +100,15 @@ void DataHandler::parseData(QByteArray data){
                 _robotId = contentValue;
                 receivedData.append(contentData + ":" + contentValue);
             }
-            else{
+            else{ //Robot sent data that doesn't need to be shown in the UI
                 qDebug() << "Data not wanted: " << contentData;
             }
 
         }
     }
-    logEvent(ReceivedData,receivedData);
-    emit updateValues();
+    logEvent(ReceivedData,receivedData); //Logging the even
+    emit updateValues(); //Updating values in the UI
 
-    checkBatteryLevel();
+    checkBatteryLevel(); //Checking the batterylevel
 
 }

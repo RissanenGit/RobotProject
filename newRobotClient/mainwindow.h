@@ -31,7 +31,7 @@ private:
     void createConnection();
 
     QString ipAddress;
-    QString *logDataToSave = new QString("");
+    QString *logDataToSave = new QString(""); //Variable holds all the data we will save into the file
     qint16 port;
 public slots:
     void changeConnectionStatus(Connection::connectionStatus status, QString statusText);
@@ -61,13 +61,13 @@ private slots:
 private:
     Ui::MainWindow *ui;
 
-    ControlForm* movementControlWindow;
+    ControlForm* movementControlWindow; //MovementControlWindow, not used
     QThread *thread;
     Connection *connection;
     DataHandler *handler;
 
     bool connected = false;
-    bool movementWindowOpen = false;
+    bool movementWindowOpen = false; //Is MovementControlWindow open, not used
 signals:
     void closeConnection();
 };

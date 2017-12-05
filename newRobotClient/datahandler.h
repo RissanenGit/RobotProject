@@ -25,7 +25,7 @@ public:
 
     const int maxSpeed = 1000;
 private:
-    const float lowBatteryLevel = 10;
+    const float lowBatteryLevel = 9.5;
 
     float _batteryLevel = 0;
     int _speed = 0;

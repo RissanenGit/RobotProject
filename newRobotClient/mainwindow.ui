@@ -210,7 +210,7 @@
     <string>Connect</string>
    </property>
    <property name="statusTip">
-    <string>Connect / Disconnect from Robot</string>
+    <string>Connect / Disconnect from the Robot</string>
    </property>
   </action>
   <action name="actionHalt">
@@ -240,7 +240,7 @@
     <string>Release</string>
    </property>
    <property name="statusTip">
-    <string>Order Robot to continue it's action</string>
+    <string>Order Robot to continue all actions</string>
    </property>
   </action>
   <action name="actionSetSpeed">

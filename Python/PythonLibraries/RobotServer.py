@@ -2,7 +2,11 @@ import socket
 import threading
 import time
 import Queue
+import psutil
 
+p=psutil.Process()
+p.cpu_affinity([1])
+print("RobotServer running on core " + str(p.cpu_affinity()))
 class RobotServer(threading.Thread):
     def __init__(self, mainQueue):
         super(RobotServer, self).__init__()
@@ -40,7 +44,7 @@ class RobotServer(threading.Thread):
         while True: #Outer loop | Wait for client to connect
             connection,address = self.serverSocket.accept()
             self.clearQueue()
-            connection.settimeout(0.1) #Set timeout for receiving / sending data
+            connection.settimeout(0.05) #Set timeout for receiving data
             print("Connection from: ", address)
 
             while True: #Inner loop | Handle sending and receiving data to/from client
