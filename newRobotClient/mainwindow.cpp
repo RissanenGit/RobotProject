@@ -85,6 +85,11 @@ void MainWindow::changeConnectionStatus(Connection::connectionStatus status,QStr
         ui->menuCommand->setEnabled(false);
         ui->actionConnect->setText("Connect");
         connected = false;
+
+        ui->batteryLabel->setText("");
+        ui->speedLabel->setText("");
+        ui->actionLabel->setText("");
+        ui->robotIdLabel->setText("");
         break;
     case Connection::ConnectionDropped:
         handler->logEvent(DataHandler::Disconnected,QList<QString>{ipAddress + ":" + QString::number(port),"Connection Lost"});
@@ -92,6 +97,11 @@ void MainWindow::changeConnectionStatus(Connection::connectionStatus status,QStr
         ui->menuCommand->setEnabled(false);
         ui->actionConnect->setText("Connect");
         connected = false;
+
+        ui->batteryLabel->setText("");
+        ui->speedLabel->setText("");
+        ui->actionLabel->setText("");
+        ui->robotIdLabel->setText("");
 
         if(movementWindowOpen){ //If the connection drops, while the MovementControlWindow is open, close it
             movementControlWindow->close();
