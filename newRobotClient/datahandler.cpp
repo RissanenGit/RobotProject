@@ -39,7 +39,7 @@ void DataHandler::checkBatteryLevel() //Checking if batterylevel is below a cert
         errorList[LowBattery] = true; //Warning has been shown
         emit lowBatteryWarning(); //Showing low battery warning in the UI
     }
-    else if(_batteryLevel > 10.5){ //If battery is above a certain point, we can show the alarm again (Battery has been recharged)
+    else if(_batteryLevel > (lowBatteryLevel + 1)){ //If batterylevel is above a certain point, we can show the alarm again (Battery has been recharged)
         errorList[LowBattery] = false;
     }
 }
@@ -49,9 +49,9 @@ void DataHandler::createMessage(messageTypes messageType, QList<QString> additio
     switch (messageType) { //Checking what type of command we are sending
     case RegisterRobot:
         message = "Command:RegisterRobot,RobotId:";
-        message += additionalData[0];
+        message += additionalData[0]; //RobotId
         message += ",RobotPassword:";
-        message += additionalData[1];
+        message += additionalData[1]; //RobotPW
         break;
     case Halt:
         message = "Command:Halt";
@@ -64,11 +64,11 @@ void DataHandler::createMessage(messageTypes messageType, QList<QString> additio
         break;
     case SetSpeed:
         message = "Command:SetSpeed,Value:";
-        message += additionalData[0];
+        message += additionalData[0]; //Speed
         break;
     case GoToWaypoint:
         message = "Command:GotoWaypoint,Value:";
-        message += additionalData[0];
+        message += additionalData[0]; //Waypoint
     default:
         break;
     }
@@ -79,14 +79,16 @@ void DataHandler::createMessage(messageTypes messageType, QList<QString> additio
 void DataHandler::parseData(QByteArray data){ //Slot handles parsing the data received from the robot to the different variables
 
     QList<QByteArray>content = data.split('\n');
+    if(content.length() == 0){return;}
+
     QList<QString>receivedData;
     for(int i = 0; i < content.length() - 1; i++){
         if(content[i].split(':').length() > 0){
             QString contentData = content[i].split(':')[0];
             QString contentValue = content[i].split(':')[1];
             if(contentData == "BatteryLevel"){
-                _batteryLevel = contentValue.toFloat() / 1000;
-                receivedData.append(contentData + ":" + QString::number((contentValue.toFloat()/1000))); //Converting the voltage from mV to V
+                _batteryLevel = (contentValue.toFloat() / 1000);
+                receivedData.append(contentData + ":" + QString::number((_batteryLevel))); //Converting the voltage from mV to V
             }
             else if(contentData == "EventData"){
                 _action = contentValue;

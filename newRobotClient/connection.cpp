@@ -28,15 +28,15 @@ bool Connection::retryConnection(){ //Handles reconnecting to the server
     QThread::msleep(retryTimeout);
     for(int i = 0;i < retryCount; i++){ //Try (5) times to connect to the server
         qDebug() << "Retry " << i + 1;
-        QThread::msleep(retryTimeout); //Sleep for 5 seconds, give time for the server to come up
-        emit connectionStatusChanged(connectionStatus::Connecting,QStringLiteral("Connecting... (Retry: %1)").arg(i + 1));//Update UI on the reconnection status
+        emit connectionStatusChanged(connectionStatus::Connecting,QStringLiteral("Connecting to Robot... \n(Retry: %1)").arg(i + 1));//Update UI on the reconnection status
         socket->connectToHost(address,port);
-        if(socket->waitForConnected(5000)){
+        if(socket->waitForConnected(500)){
             qDebug() << "Connection re-established";
-            emit connectionStatusChanged(connectionStatus::Connected,"Connected");
+            emit connectionStatusChanged(connectionStatus::Connected,"Connected to Robot");
             connectSignals(); //Reconnect signals
             return true; //Connection re-established
         }
+        QThread::msleep(retryTimeout); //Sleep for 5 seconds, give time for the server to come up
     }
     return false; //Can't re-establish connection
 }
@@ -48,16 +48,16 @@ void Connection::createConnection(){ //Entrypoint
     socket = new QTcpSocket();
     socket->connectToHost(address,port);
 
-    emit connectionStatusChanged(connectionStatus::Connecting,"Connecting...");
+    emit connectionStatusChanged(connectionStatus::Connecting,"Connecting to Robot...");
     if(socket->waitForConnected(5000)){
         qDebug() << "Connected to server";
-        emit connectionStatusChanged(connectionStatus::Connected,"Connected");
+        emit connectionStatusChanged(connectionStatus::Connected,"Connected to Robot");
         connectSignals();//Connect signals
     }
     else{
         qDebug() << "Cant connect to server";
         if(!retryConnection()){ //Try to connect 5 times
-            emit connectionStatusChanged(connectionStatus::Disconnected,"Cant connect to server");
+            emit connectionStatusChanged(connectionStatus::Disconnected,"Cant connect to Robot");
             emit finished(); //Emitting finished, signal is allocated to threads quit slot, this will exit from the thread
         }
     }
@@ -77,13 +77,13 @@ void Connection::disconnectedFromServer(){ //Connection dropped
     disconnectSignals();
 
     if(!retry){
-        emit connectionStatusChanged(connectionStatus::ConnectionDropped,"Connection Lost");
+        emit connectionStatusChanged(connectionStatus::ConnectionDropped,"Connection to Robot lost");
         qDebug() << "Connection emitting finished";
         emit finished();//Exit from thread
     }
     if(retry && !retryConnection()){//Try reconnecting
         qDebug("Cannot re-establish connection");
-        emit connectionStatusChanged(connectionStatus::ConnectionDropped,"Connection Lost");
+        emit connectionStatusChanged(connectionStatus::ConnectionDropped,"Connection to Robot lost");
         qDebug() << "Connection emitting finished";
         emit finished();//Exit from thread
     }
@@ -98,6 +98,6 @@ void Connection::closeConnection(){//User wants to disconnect through UI
     socket->close();
 
     qDebug() << "Connection emitting finished";
-    emit connectionStatusChanged(connectionStatus::Disconnected,"Disconnected");
+    emit connectionStatusChanged(connectionStatus::Disconnected,"Disconnected from Robot");
     emit finished();//Exit from thread
 }

@@ -25,6 +25,7 @@ MainWindow::MainWindow(QWidget *parent) :
 }
 
 MainWindow::~MainWindow(){
+    qDebug() << "Deleting MainWindow";
     delete ui;
     delete logDataToSave;
 }
@@ -44,7 +45,7 @@ void MainWindow::connectSignals(){ //Connecting all the signals necessary for op
     connect(connection,SIGNAL(dataReady(QByteArray)),handler,SLOT(parseData(QByteArray))); //connection->handler | Data is ready at socket, send it to DataHandler
 
     connect(handler,SIGNAL(updateValues()),this,SLOT(updateUiValues())); //handler->this | Updating UI values
-    connect(handler,SIGNAL(sendMessage(QByteArray)),connection,SLOT(sendData(QByteArray))); //handler->connection | Temporary for sending messages via socket
+    connect(handler,SIGNAL(sendMessage(QByteArray)),connection,SLOT(sendData(QByteArray))); //handler->connection | For sending messages via socket
 
     connect(handler,SIGNAL(sendLogData(QString)),this,SLOT(updateLog(QString))); //handler->this | Upading the logview in UI
     connect(handler,SIGNAL(lowBatteryWarning()),this,SLOT(batteryLevelWarning())); //handler->this | If battery is below threshold, show a warning popup
@@ -65,29 +66,29 @@ void MainWindow::createConnection(){ //Creating objects and starting the thread
 ///Slots->
 void MainWindow::changeConnectionStatus(Connection::connectionStatus status,QString statusText){ //Called from connection, to update the connection status in the UI elements
     ui->statusLabel->setText(statusText);
-    switch (status){
+    switch (status){ //Enable / Disable UI elements, based on connection status
     case Connection::Connecting:
         handler->logEvent(DataHandler::Connecting,QList<QString>{ipAddress + ":" + QString::number(port)});
-        ui->menuConnect->setEnabled(false);
+        ui->actionConnect->setEnabled(false);
         ui->menuCommand->setEnabled(false);
         break;
     case Connection::Connected:
         handler->logEvent(DataHandler::Connected,QList<QString>{ipAddress + ":" + QString::number(port)});
-        ui->menuConnect->setEnabled(true);
+        ui->actionConnect->setEnabled(true);
         ui->menuCommand->setEnabled(true);
         ui->actionConnect->setText("Disconnect");
         connected = true;
         break;
     case Connection::Disconnected:
         handler->logEvent(DataHandler::Disconnected,QList<QString>{ipAddress + ":" + QString::number(port)});
-        ui->menuConnect->setEnabled(true);
+        ui->actionConnect->setEnabled(true);
         ui->menuCommand->setEnabled(false);
         ui->actionConnect->setText("Connect");
         connected = false;
         break;
     case Connection::ConnectionDropped:
         handler->logEvent(DataHandler::Disconnected,QList<QString>{ipAddress + ":" + QString::number(port),"Connection Lost"});
-        ui->menuConnect->setEnabled(true);
+        ui->actionConnect->setEnabled(true);
         ui->menuCommand->setEnabled(false);
         ui->actionConnect->setText("Connect");
         connected = false;
@@ -229,8 +230,8 @@ void MainWindow::showAbout(){ QMessageBox::information(this, "About", "This prog
 
 void MainWindow::movementControl(){ //Open MovementControlWindow
     movementControlWindow = new ControlForm(nullptr,handler);
-    movementControlWindow->setAttribute(Qt::WA_DeleteOnClose);
-    connect(movementControlWindow,SIGNAL(destroyed(QObject*)),this,SLOT(movementWindowAction()));
+    movementControlWindow->setAttribute(Qt::WA_DeleteOnClose); //Delete window on closing
+    connect(movementControlWindow,SIGNAL(destroyed(QObject*)),this,SLOT(movementWindowAction())); //After window is destroyed
     movementControlWindow->show();
 
     movementWindowAction();

@@ -23,13 +23,13 @@ public:
     void createMessage(messageTypes messageType, QList<QString> additionalData = QList<QString>());
     void logEvent(eventType event, QList<QString> eventData = QList<QString>());
 
-    const int maxSpeed = 1000;
+    const int maxSpeed = 600;
 private:
     const float lowBatteryLevel = 9.5;
 
     float _batteryLevel = 0;
     int _speed = 0;
-    QString _robotId = "None";
+    QString _robotId = "";
     QString _action = "";
     void checkBatteryLevel();
 
